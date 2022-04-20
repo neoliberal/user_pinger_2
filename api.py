@@ -11,7 +11,6 @@ import requests
 import sqlite3
 import time
 from typing import List, Union
-from unittest.mock import Mock
 
 from fastapi import FastAPI, HTTPException
 import praw
@@ -74,7 +73,7 @@ def is_mod(username):
         client_id=os.environ["CLIENT_ID"],
         client_secret=os.environ["CLIENT_SECRET"],
         refresh_token=os.environ["REFRESH_TOKEN"],
-        user_agent="linux:userpinger-wiki_updater:v2.0.0beta1 (by /u/jenbanim)"
+        user_agent="linux:user_pinger_2-api:v0.0.1 (by /u/jenbanim)"
     )
     subreddit = os.environ["SUBREDDIT"]
     return username in reddit.subreddit(subreddit).moderator()
@@ -100,7 +99,7 @@ def subscribe(access_token: str, group: str) -> str:
     with db:
         with open("sql/functions/subscribe_user_to_group.sql") as f:
             arg = {
-                "username": username,
+                "username": username.lower(),
                 "group_name": group,
                 "created_epoch_sec": int(time.time())
             }
@@ -143,7 +142,7 @@ def subscribe_user(access_token: str, user: str, group:str) -> str:
             db.executescript(f.read())
         with open("sql/functions/subscribe_user_to_group.sql") as f:
             arg = {
-                "username": user,
+                "username": user.lower(),
                 "group_name": group,
                 "created_epoch_sec": int(time.time())
             }
@@ -274,10 +273,11 @@ def update_groups(config: UpdateGroups):
             raise HTTPException(status_code=400, detail="Invalid category")
         for subcat_idx, subcategory in enumerate(category["subcategories"]):
             subcategory_name = subcategory["subcategory_name"]
-            if ":" in subcategory_name:
-                raise HTTPException(
-                    status_code=400, detail="Invalid subcategory"
-                )
+            if subcategory_name is not None:
+                if ":" in subcategory_name:
+                    raise HTTPException(
+                        status_code=400, detail="Invalid subcategory"
+                    )
             if subcategory_name is not None:
                 subcategory_name = f"{subcat_idx} {subcategory_name}"
             for group in subcategory["groups"]:

@@ -6,7 +6,7 @@ import time
 
 import praw
 
-from slack_python_logging import slack_logger
+import slack_python_logging
 
 
 def update(reddit, subreddit, after_epoch):
@@ -36,7 +36,6 @@ def update(reddit, subreddit, after_epoch):
         for category
         in groupby(sorted(data, key = lambda x: x[2]), lambda x: x[2][0])
     ]
-    print(data)
     lines = []
     for category in categorized:
         category_name = category[0][0][2].split(":")[0][2:]
@@ -57,7 +56,7 @@ def update(reddit, subreddit, after_epoch):
                 subscribe_url = (
                     "https://reddit.com/message/compose"
                     f"?to={reddit.user.me()}"
-                    f"&subject=Subscribe20to%20{group_name}"
+                    f"&subject=Subscribe%20to%20{group_name}"
                     f"&message=subscribe%20{group_name}"
                 )
                 name_and_attr = [f"[{group_name}]({subscribe_url})"]
@@ -79,7 +78,7 @@ def update(reddit, subreddit, after_epoch):
     )
 
     # Edit wiki page
-    reddit.subreddit(primary_subreddit).wiki["user_pinger_v2"].edit(
+    reddit.subreddit(primary_subreddit).wiki["user_pinger_2"].edit(
         wiki_documentation,
         reason = "Automatic update"
     )
@@ -92,10 +91,10 @@ if __name__ == "__main__":
         client_id=os.environ["CLIENT_ID"],
         client_secret=os.environ["CLIENT_SECRET"],
         refresh_token=os.environ["REFRESH_TOKEN"],
-        user_agent="linux:userpinger-wiki_updater:v2.0.0beta1 (by /u/jenbanim)"
+        user_agent="linux:user_pinger_2-wiki_updater:v0.0.1 (by /u/jenbanim)"
     )
     # TODO put in environment variables
-    logger = slack_logger.initialize(
+    logger = slack_python_logging.getLogger(
         app_name = "user_pinger-wiki_updater",
         slack_loglevel = "CRITICAL",
         stream_loglevel = "INFO"

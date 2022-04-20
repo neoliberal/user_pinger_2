@@ -1,7 +1,6 @@
 """Common functions for the various user_pinger services"""
 
 import string
-import emoji
 
 def group_name_is_valid(group_name):
     """Return bool indicating whether group name is valid"""

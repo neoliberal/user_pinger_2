@@ -1,9 +1,4 @@
-# MAKE SURE TO INSERT USERNAMES LOWERCASE
-
 """Script for running user_pinger bot."""
-
-# remove later
-import logging
 
 import os
 import time
@@ -15,7 +10,7 @@ import sys
 import praw
 import prawcore
 
-from slack_python_logging import slack_logger
+import slack_python_logging
 import pinglib
 
 
@@ -57,9 +52,10 @@ class UserPinger:
         # ALWAYS return comments in order of newest to oldest even when using a
         # muti-reddit?
         for comment in self.subreddit.stream.comments(pause_after=1):
+            if comment is None:
+                break # comment stream done, listen to messages
             if not (
-                comment is None  # End of stream
-                or comment.banned_by is not None  # removed or spam filtered
+                comment.banned_by is not None  # removed or spam filtered
                 or comment.created_utc < self.start_time  # prior to startup
                 or str(comment) in self.parsed  # already been handled
             ):
@@ -70,6 +66,8 @@ class UserPinger:
                 if item.created_utc > self.start_time:
                     # Only trigger on messages posted after startup
                     self.handle_message(item)
+                else:
+                    item.mark_read()
             else:
                 item.mark_read()
 
@@ -122,7 +120,7 @@ class UserPinger:
             token = comment_split[index + 1]
             # Stripping punctuation handles comments like:
             # "!ping WEEBS, what do you think of this?"
-            token.strip(string.punctuation)
+            token = token.strip(string.punctuation)
         except IndexError:
             self.logger.warning("%s Missing group, sending error", comment.id)
             self.parsed.append(comment.id)
@@ -141,7 +139,7 @@ class UserPinger:
                 "%s too many groups, sending error", comment.id
             )
             error = (
-                f"The token {token} is invalid. You cannot ping more than"
+                f"The token {token} is invalid. You cannot ping more than "
                 f"{max_group_pings} groups at once."
             )
             self.parsed.append(comment.id)
@@ -303,7 +301,7 @@ class UserPinger:
             ping_comment_body.append(ping_comment_group)
         root_comment = comment
         while root_comment.is_root is False:
-            root_comment = comment.parent
+            root_comment = root_comment.parent()
         if comment != root_comment:
             ping_comment_body.append(
                 f"[Root comment link]({root_comment.permalink})"
@@ -355,7 +353,7 @@ class UserPinger:
                 with open("sql/functions/unsubscribe_user_from_all.sql") as f:
                     arg = {"username": str(message.author)}
                     self.db.execute(f.read(), arg)
-            resubscribe_groups = "subscribe " + "&".join(unsubscribed_groups)
+            resubscribe_groups = "subscribe " + "%26".join(unsubscribed_groups)
             with open("templates/unsubscribed_from_all.txt") as f:
                 message_body_template = string.Template(f.read())
             message_body = message_body_template.substitute(
@@ -389,7 +387,7 @@ class UserPinger:
         # All remaining commands are in the form [command, group(s)]
         try:
             command = words[0]
-            token = words[1]
+            token = words[1].upper()
         except IndexError:
             self.logger.warning(
                 "%s invalid command %s", message.id, message.body
@@ -398,7 +396,7 @@ class UserPinger:
             error = f"Invalid command"
             self.message_error_reply(message, error)
             return
-        groups = token.upper().split("&")
+        groups = token.split("&")
         commands = ("unsubscribe", "subscribe", "addtogroup")
         if command not in commands:
             self.logger.warning(
@@ -461,12 +459,13 @@ class UserPinger:
                 message_body_template = string.Template(f.read())
             message_body = message_body_template.substitute(
                 bot_username=self.username,
-                token=token
+                token=token,
+                url_token=token.replace("&", "%26")
             )
             message.mark_read()
             message.author.message(
                 subject="Unsubscribed from group(s)",
-                body=message_body
+                message=message_body
             )
             return
 
@@ -501,16 +500,17 @@ class UserPinger:
                 self.logger.info(
                     "%s subscribed to %s", message.id, token
                 )
-            with open("templates/unsubscribed_from_group.txt") as f:
+            with open("templates/subscribed_to_group.txt") as f:
                 message_body_template = string.Template(f.read())
             message_body = message_body_template.substitute(
                 bot_username=self.username,
-                token=token
+                token=token,
+                url_token=token.replace("&", "%26")
             )
             message.mark_read()
             message.author.message(
                 subject="Subscribed to group",
-                message="You have subscribed to {groups}"
+                message=message_body
             )
 
 
@@ -522,10 +522,10 @@ if __name__ == "__main__":
         client_id=os.environ["CLIENT_ID"],
         client_secret=os.environ["CLIENT_SECRET"],
         refresh_token=os.environ["REFRESH_TOKEN"],
-        user_agent="linux:userpinger:v2.0.0beta1 (by /u/jenbanim)"
+        user_agent="linux:user_pinger_2-bot:v0.0.1 (by /u/jenbanim)"
     )
     # TODO put in environment variables
-    logger = slack.logger.initialize(
+    logger = slack_python_logging.getLogger(
         app_name = "user_pinger",
         slack_loglevel = "CRITICAL",
         stream_loglevel = "INFO"
@@ -549,6 +549,6 @@ if __name__ == "__main__":
     while True:
         try:
             user_pinger.listen()
-        except recoverable_error:
+        except recoverable_errors:
             user_pinger.logger.warning("Reddit API error - sleeping 1 minute")
             time.sleep(60)
