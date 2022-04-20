@@ -1,0 +1,13 @@
+server {
+    listen 8080;
+    
+    location / {
+        alias /bots/user_pinger/www/;
+    }
+
+    location /api/ {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://bots/user_pinger/api.sock:/;
+    }
+}

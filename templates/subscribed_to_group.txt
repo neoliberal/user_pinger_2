@@ -1,0 +1,3 @@
+You have subscribed to ${token}
+
+If this was an accident, [click here to undo this action](https://reddit.com/message/compose?to=${bot_username}&subject=Unsubscribe%20from%20group&message=unsubscribe%20${token})

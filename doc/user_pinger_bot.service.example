@@ -1,0 +1,14 @@
+# Of course all this is specific to the machine and bot being run. It's just
+# here for convenience
+
+[Unit]
+Description=User Pinger Bot
+
+[Service]
+User=user_pinger
+WorkingDirectory=/bots/user_pinger/
+# SLACK_APP_NAME should be used by the slack_python_logging module but it
+# isn't implemented yet
+Environment=SLACK_APP_NAME=user_pinger_bot
+EnvironmentFile=/user_pinger/variables.env
+ExecStart=/bots/user_pinger/env/bin/python3 /bots/user_pinger/bot.py

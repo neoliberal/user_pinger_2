@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Subscriptions</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div id="banner">
+        <div id="page-title">Manage Pings</div>
+        <button id="toggle-mod-mode" onclick="toggle_mod_mode()">Enable Mod Mode</button>
+    </div>
+    <div id="content">
+        <div id="description">
+            <div id="welcome"></div>
+            <p>You can manage your subscriptions on this page.</p>
+            <p>You need mod approval to subscribe to a protected group. Message the mods to request access.</p>
+            <ul>
+                <li class="mod-only" style="display:none">
+                    &#x270B; Protected: only mods can subscribe
+                </li>
+                <li class="mod-only" style="display:none">
+                    &#x1F512; Locked: only mods can ping
+                </li>
+                <li class="mod-only" style="display:none">
+                    &#x1F648; Hidden: group does not appear in documentation (except to mods)
+                </li>
+                <li>
+                    &#x1F4E9; Activity: how many pings the group has received in the last 7 days
+                </li>
+            </ul>
+            <div id="mod-help" class="mod-only" style="display:none">
+                <h2>Mod Tools</h2>
+                    <p>
+                        Subscribe user <input id="subscribe_user_name" onchange="validate_username(this)"> 
+                        to group <input id="subscribe_user_group" onchange="validate_group(this)"> 
+                        <button onclick="subscribe_user_to_group()">submit</button>
+                    </p>
+                    <p>
+                        Create alias <input id ="create_alias_name" onchange="validate_alias(this)"> 
+                        pointing to group <input id="create_alias_group" onchange="validate_group(this)"> 
+                        <button onclick="create_alias()">submit</button>
+                    </p>
+                    <p>No need to delete groups, just set locked, protected, and hidden.</p>
+            </div>
+        </div>
+        <div id="groups">
+        </div>
+    </div>
+    <div id="footer">
+        <a href="https://github.com/neoliberal/user_pinger/">user_pinger_v2</a> 
+        created by <a href="https://reddit.com/user/jenbanim">/u/jenbanim</a>
+    </div>
+    <button id="save-prompt" style="display:none" onclick="update_groups()">Save Changes</div>
+    <button id="discard-prompt" style="display:none" onclick="discard_changes()">Discard Changes</div>
+</body>
+
+<script type="text/javascript" src="index.js"></script>

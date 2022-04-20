@@ -1,0 +1,5 @@
+There was an error while handling [your ping](${comment_url}). Error message:
+
+>${error}
+
+This bot does not pay attention to comments that are edited. Post another comment to try again. If you're having trouble, [read the documentation](https://reddit.com/r/${primary_subreddit}/wiki/userpinger/documentation)) or [message the mods](https://reddit.com/message/compose?to=/r/${primary_subreddit})

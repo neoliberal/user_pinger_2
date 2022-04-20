@@ -1,0 +1,5 @@
+There was an error while handling your message
+
+>${error}
+
+If you're having trouble, please [read the documentation](https://reddit.com/r/${primary_subreddit}/wiki/userpinger/documentation)) or [message the mods](https://reddit.com/message/compose?to=/r/${primary_subreddit})

@@ -1,0 +1,3 @@
+${ping_comment_body}
+
+[About & Group List](https://reddit.com/r/${primary_subreddit}/wiki/userpinger/documentation) | [Unsubscribe from all groups](https://reddit.com/message/compose?to=${bot_username}&subject=Unsubscribe%20from%20all%20groups&message=unsubscribe all)

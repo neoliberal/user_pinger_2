@@ -1,0 +1,124 @@
+body {
+    margin: 0;
+    background-color: #d3d2d6;
+    font-family: sans;
+}
+
+#banner {
+    background-color: #222641;
+    color: #f1f1f1;
+    display: flex;
+    height: 8vh;
+    line-height: 8vh;
+    text-align: center;
+    font-size: min(7vh, 7vw);
+    justify-content: space-between;
+    padding: 2vh 5vw 2vh 5vw;
+}
+
+#toggle-mod-mode {
+    font-size: min(2.5vh, 4vw);
+}
+
+#welcome {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.group-category {
+    padding-bottom: 10px;
+}
+
+th {
+    text-align: left;
+}
+
+#footer {
+    text-align: center;
+    margin-bottom: 5vh;
+}
+
+#save-prompt {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    height: 9vh;
+    width: min(45vh, 35vw);
+    background-color: #67ec67;
+    border: none;
+}
+
+#discard-prompt {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 9vh;
+    width: min(45vh, 35vw);
+    background-color: #ec6767;
+    border: none;
+}
+
+#content {
+    background-color: #f1f1f1;
+    color: #252525;
+    margin: 5vh 5vw 10vh 5vw;
+    padding: 5vh 5vw 5vh 5vw;
+}
+
+#description {
+    margin-bottom: 20px;
+}
+
+#mod-help {
+    margin: 10px 0 10px 0;
+}
+
+.subcategory {
+    margin-left: 2.8vw;
+}
+
+table {
+    margin-left: 1.5vw;
+    margin-top: 10px;
+    font-size: min(0.9em, 2.5vw);
+    overflow-wrap: anywhere;
+}
+
+h2 {
+    margin: 30px 0 0 0;
+}
+
+h3 {
+    margin: 20px 0 0 0;
+}
+
+h2 * {
+    font-size: min(0.85em, 4vw);
+    font-weight: bold;
+}
+
+h3 * {
+    font-size: min(0.9em, 3vw);
+    font-weight: bold;
+}
+
+input {
+    max-width: 30vw;
+}
+
+tr input {
+    max-width: 20vw;
+}
+
+td input, td button {
+    font-size: min(0.9em, 2.5vw);
+}
+
+.bad-input input, input.bad-input {
+    background-color: #ff6060;
+}
+
+.bad-input button, button.bad-input {
+    pointer-events: none;
+    color: #BBB;
+}
