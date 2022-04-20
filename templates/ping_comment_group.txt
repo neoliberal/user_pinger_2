@@ -1,1 +1,1 @@
-Pinged ${group} ([subscribe](https://reddit.com/message/compose?to=${bot_username}&subject=Subscribe%20to%20${group}&body=subscribe%20${group}) | [unsubscribe](https://reddit.com/message/compose?to=${bot_username}&subject=Unsubscribe%20from%20${group}&body=unsubscribe%20${group}))  
+Pinged ${group} ([subscribe](https://reddit.com/message/compose?to=${bot_username}&subject=Subscribe%20to%20${group}&message=subscribe%20${group}) | [unsubscribe](https://reddit.com/message/compose?to=${bot_username}&subject=Unsubscribe%20from%20${group}&message=unsubscribe%20${group}))
