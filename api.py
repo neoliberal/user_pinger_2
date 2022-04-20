@@ -55,7 +55,8 @@ def get_user(access_token: str) -> str:
 def group_is_valid_and_exists(group: str) -> bool:
     if not pinglib.group_name_is_valid(group):
         return False
-    db = sqlite3.connect(f"sql/db/{subreddit}.sql")
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
         with open("sql/functions/init_db.sql") as f:
             db.executescript(f.read())
@@ -75,16 +76,17 @@ def is_mod(username):
         refresh_token=os.environ["REFRESH_TOKEN"],
         user_agent="linux:userpinger-wiki_updater:v2.0.0beta1 (by /u/jenbanim)"
     )
-    subreddit = os.environ.get["SUBREDDIT"]
-    return username in reddit.subreddit(subreddit).mod()
+    subreddit = os.environ["SUBREDDIT"]
+    return username in reddit.subreddit(subreddit).moderator()
 
 
 @api.post(path="/subscribe")
 def subscribe(access_token: str, group: str) -> str:
     username = get_user(access_token)
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not group_is_valid_and_exists(group):
         raise HTTPException(status_code=400, detail="Invalid group")
-    db = sqlite3.connect(f"sql/db/{subreddit}.sql")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
         with open("sql/functions/init_db.sql") as f:
             db.executescript(f.read())
@@ -109,9 +111,10 @@ def subscribe(access_token: str, group: str) -> str:
 @api.post(path="/unsubscribe")
 def unsubscribe(access_token: str, group: str) -> str:
     username = get_user(access_token)
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not group_is_valid_and_exists(group):
         raise HTTPException(status_code=400, detail="Invalid group")
-    db = sqlite3.connect(f"sql/db/{subreddit}.sql")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
         with open("sql/functions/init_db.sql") as f:
             db.executescript(f.read())
@@ -127,13 +130,14 @@ def unsubscribe(access_token: str, group: str) -> str:
 @api.post(path="/subscribe_user")
 def subscribe_user(access_token: str, user: str, group:str) -> str:
     username = get_user(access_token)
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not is_mod(username):
         raise HTTPException(status_code=403, detail="You must be a mod")
     if not re.match("^[a-zA-Z0-9_-]{1,20}$", user):
         raise HTTPException(status_code=400, detail="Invalid user")
     if not group_is_valid_and_exists(group):
         raise HTTPException(status_code=400, detail="Invalid group")
-    db = sqlite3.connect(f"sql/db/{subreddit}.sql")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
         with open("sql/functions/init_db.sql") as f:
             db.executescript(f.read())
@@ -150,13 +154,14 @@ def subscribe_user(access_token: str, user: str, group:str) -> str:
 @api.post(path="/create_alias")
 def create_alias(access_token: str, alias: str, group: str):
     username = get_user(access_token)
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not is_mod(username):
         raise HTTPException(status_code=403, detail="You must be a mod")
     if not pinglib.group_name_is_valid(alias):
         raise HTTPException(status_code=400, detail="Invalid alias")
     if not group_is_valid_and_exists(group):
         raise HTTPException(status_code=400, detail="Invalid group")
-    db = sqlite3.connect(f"sql/db/{subreddit}.sql")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
         with open("sql/functions/init_db.sql") as f:
             db.executescript(f.read())
@@ -190,7 +195,7 @@ def list_groups(access_token:str) -> List[Category]:
     username = get_user(access_token)
     after_epoch = time.time() - 60*60*24*7
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
-    db = sqlite3.connect(f"sql/db/{subreddit}.sql")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
     cur = db.cursor()
     with open("sql/functions/init_db.sql") as f:
         db.executescript(f.read())
@@ -299,7 +304,8 @@ def update_groups(config: UpdateGroups):
     groups.sort(key = lambda x: x[0])
 
     # Insert/update groups
-    db = sqlite3.connect(f"sql/db/{subreddit}.sql")
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
         with open("sql/functions/init_db.sql") as f:
             db.executescript(f.read())
