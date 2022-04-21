@@ -13,7 +13,7 @@ function load_page() {
     fetch(
         `api/me?access_token=${access_token}`
     ).then((response) => {
-        if (response.status != "200") { 
+        if (response.status != "200") {
             // If the user's login doesn't work, make 'em get a new one
             location.href = "login.html";
         }
@@ -29,6 +29,7 @@ function load_page() {
                 return response.json();
             })
             .then((data) => {
+                document.getElementById("save-prompt").classList.remove("loading");
                 groups = data;
                 old_groups = JSON.parse(JSON.stringify(groups));
                 build_group_table(data);
@@ -158,8 +159,10 @@ function discard_changes() {
 
 function update_groups() {
     let body = JSON.stringify({"access_token": access_token, "groups": groups});
+    document.getElementById("save-prompt").classList.add("loading");
+    document.getElementById("discard-prompt").style.display = "none";
     fetch(
-        "api/update_groups", 
+        "api/update_groups",
         {method: "POST", headers: {"Content-Type": "application/json"}, body: body}
     ).then((response) => {
         if (response.status != "200") {
@@ -630,7 +633,7 @@ function edit_group_hidden (e) {
 
 
 function build_group_table(groups) {
-    
+
     // If groups have been edited prompt to save
     let save_prompt = document.getElementById("save-prompt");
     let discard_prompt = document.getElementById("discard-prompt");
@@ -643,7 +646,7 @@ function build_group_table(groups) {
         discard_prompt.style.display = "none";
         document.getElementById("toggle-mod-mode").classList.remove("bad-input");
     }
-    
+
     // Create the "Ping Groups:" header
     document.getElementById("groups").innerHTML = "";
     const groups_header = document.createElement("h1");
@@ -651,10 +654,13 @@ function build_group_table(groups) {
     groups_header.appendChild(groups_header_text);
     if (mod_mode) {
         let create_category_button = document.createElement("button");
+        document.getElementById("groups").classList.remove("user-mode");
         create_category_button.style.verticalAlign = "middle";
         create_category_button.addEventListener("click", add_category);
         create_category_button.appendChild(document.createTextNode("\u{2795}"));
         groups_header.appendChild(create_category_button);
+    } else {
+        document.getElementById("groups").classList.add("user-mode");
     }
     document.getElementById("groups").appendChild(groups_header);
 
@@ -693,7 +699,7 @@ function build_group_table(groups) {
             category_element.appendChild(category_title);
             category_element.id = `groups_${category_name}`
             document.getElementById("groups").appendChild(category_element);
-        } 
+        }
 
         // Iterate over subcategories
         for(var subcat_idx = 0; subcat_idx < category["subcategories"].length; subcat_idx++) {
@@ -768,7 +774,7 @@ function build_group_table(groups) {
                 }
                 if (subcategory["groups"].length > 0) {
                     document.getElementById(subcategory_table.id).append(subcategory_header);
-                } 
+                }
             }
 
             // Create rows in subcategory for each group

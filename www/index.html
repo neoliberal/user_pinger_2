@@ -1,3 +1,7 @@
+<!--
+Hello, if you're looking at my code, please let me know if you find any issues.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,40 +14,43 @@
 <body>
     <div id="banner">
         <div id="page-title">Manage Pings</div>
-        <button id="toggle-mod-mode" onclick="toggle_mod_mode()">Enable Mod Mode</button>
+        <button id="toggle-mod-mode" class="bad-input" onclick="toggle_mod_mode()">Enable Mod Mode</button>
     </div>
     <div id="content">
         <div id="description">
-            <div id="welcome"></div>
-            <p>You can manage your subscriptions on this page.</p>
-            <p>You need mod approval to subscribe to a protected group. Message the mods to request access.</p>
-            <ul>
-                <li class="mod-only" style="display:none">
-                    &#x270B; Protected: only mods can subscribe
-                </li>
-                <li class="mod-only" style="display:none">
-                    &#x1F512; Locked: only mods can ping
-                </li>
-                <li class="mod-only" style="display:none">
-                    &#x1F648; Hidden: group does not appear in documentation (except to mods)
-                </li>
-                <li>
-                    &#x1F4E9; Activity: how many pings the group has received in the last 7 days
-                </li>
-            </ul>
+            <div id="welcome">
+            </div>
+            <div id="description">
+                <p>You can manage your subscriptions on this page.</p>
+                <p>You need mod approval to subscribe to a protected group. Message the mods to request access.</p>
+                <ul>
+                    <li class="mod-only" style="display:none">
+                        &#x270B; Protected: only mods can subscribe
+                    </li>
+                    <li class="mod-only" style="display:none">
+                        &#x1F512; Locked: only mods can ping
+                    </li>
+                    <li class="mod-only" style="display:none">
+                        &#x1F648; Hidden: group does not appear in documentation (except to mods)
+                    </li>
+                    <li>
+                        &#x1F4E9; Activity: how many pings the group has received in the last 7 days
+                    </li>
+                </ul>
+            </div>
             <div id="mod-help" class="mod-only" style="display:none">
-                <h2>Mod Tools</h2>
+                <h2>Mod Functions</h2>
+                    <p>No need to delete groups, just set locked, protected, and hidden. Use the "subscribe user" boxes above to subscribe either yourself or someone else to a protected group.</p>
                     <p>
-                        Subscribe user <input id="subscribe_user_name" onchange="validate_username(this)"> 
-                        to group <input id="subscribe_user_group" onchange="validate_group(this)"> 
+                        Subscribe <input id="subscribe_user_name" onchange="validate_username(this)" value="user" autocomplete="off">
+                        to <input id="subscribe_user_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
                         <button onclick="subscribe_user_to_group()">submit</button>
                     </p>
                     <p>
-                        Create alias <input id ="create_alias_name" onchange="validate_alias(this)"> 
-                        pointing to group <input id="create_alias_group" onchange="validate_group(this)"> 
+                        Create <input id ="create_alias_name" onchange="validate_alias(this)" value="ALIAS" autocomplete="off">
+                        pointing to <input id="create_alias_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
                         <button onclick="create_alias()">submit</button>
                     </p>
-                    <p>No need to delete groups, just set locked, protected, and hidden. Use the "subscribe user" boxes above to subscribe either yourself or someone else to a protected group.</p>
             </div>
         </div>
         <div id="groups">
@@ -53,7 +60,9 @@
         <a href="https://github.com/neoliberal/user_pinger_2/">user_pinger_2</a>
         created by <a href="https://reddit.com/user/jenbanim">/u/jenbanim</a>
     </div>
-    <button id="save-prompt" style="display:none" onclick="update_groups()">Save Changes</div>
+    <button id="save-prompt" style="display:none" onclick="update_groups()">
+        <span id="save-prompt-text">Save Changes</span>
+    </div>
     <button id="discard-prompt" style="display:none" onclick="discard_changes()">Discard Changes</div>
 </body>
 
