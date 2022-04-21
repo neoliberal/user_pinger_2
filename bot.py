@@ -492,7 +492,7 @@ class UserPinger:
                 with self.db:
                     with open("sql/functions/subscribe_user_to_group.sql") as f:
                         arg = {
-                            "username": str(message.author),
+                            "username": str(message.author).lower(),
                             "group_name": group,
                             "created_epoch_sec": message.created_utc
                         }
@@ -544,7 +544,8 @@ if __name__ == "__main__":
     recoverable_errors = (
         prawcore.exceptions.ServerError,
         prawcore.exceptions.ResponseException,
-        prawcore.exceptions.RequestException
+        prawcore.exceptions.RequestException,
+        praw.exceptions.RedditAPIException
     )
     while True:
         try:

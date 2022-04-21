@@ -152,6 +152,7 @@ def subscribe_user(access_token: str, user: str, group:str) -> str:
 
 @api.post(path="/create_alias")
 def create_alias(access_token: str, alias: str, group: str):
+    # TODO check if alias already exists and throw error
     username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not is_mod(username):
@@ -208,6 +209,7 @@ def list_groups(access_token:str) -> List[Category]:
     else:
         with open("sql/functions/get_user_documentation.sql") as f:
             data = cur.execute(f.read(), {"after_epoch": after_epoch}).fetchall()
+    db.close()
     # I apologize for this absolutely sweet list comprehension
     # TODO pit in pinglib? I use this twice
     categorized = [
