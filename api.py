@@ -174,6 +174,22 @@ def create_alias(access_token: str, alias: str, group: str):
     return "success"
 
 
+@api.get(path="/get_ping_log")
+def get_ping_log(after_epoch: int) -> str:
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
+    cur = db.cursor()
+    with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
+        with open("sql/functions/get_ping_log.sql") as f:
+            arg = {"after_epoch": after_epoch}
+            ping_log = cur.execute(f.read(), arg).fetchall()
+    db.close()
+    return ping_log
+
+
+
 class SubCategory(TypedDict):
     subcategory_name: Union[str, None]
     groups: List
