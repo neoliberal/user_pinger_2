@@ -60,3 +60,9 @@ CREATE TABLE IF NOT EXISTS ping_log_group_ids (
     FOREIGN KEY (group_id) REFERENCES ping_groups (group_id),
     FOREIGN KEY (comment_id) REFERENCES ping_log (comment_id)
 );
+
+-- These tables are generated when getting the group documentation. Because
+-- init_db.sql is called immediately before getting the documentation, I can
+-- delete these here to avoid getting stale data
+DROP TABLE IF EXISTS ping_count;
+DROP TABLE IF EXISTS user_subscriptions;

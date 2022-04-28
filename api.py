@@ -216,15 +216,15 @@ def list_groups(access_token:str) -> List[Category]:
     with open("sql/functions/init_db.sql") as f:
         db.executescript(f.read())
     with open("sql/functions/prepare_documentation.sql") as f:
-        db.executescript(f.read())
+        cur.execute(f.read(), {"after_epoch": after_epoch})
     with open("sql/functions/prepare_user_documentation.sql") as f:
         cur.execute(f.read(), {"username": username})
     if is_mod(username):
         with open("sql/functions/get_mod_documentation.sql") as f:
-            data = cur.execute(f.read(), {"after_epoch": after_epoch}).fetchall()
+            data = cur.execute(f.read()).fetchall()
     else:
         with open("sql/functions/get_user_documentation.sql") as f:
-            data = cur.execute(f.read(), {"after_epoch": after_epoch}).fetchall()
+            data = cur.execute(f.read()).fetchall()
     db.close()
     # I apologize for this absolutely sweet list comprehension
     # TODO pit in pinglib? I use this twice

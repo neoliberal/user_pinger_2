@@ -19,9 +19,9 @@ def update(reddit, subreddit, after_epoch):
     with open("sql/functions/init_db.sql") as f:
         db.executescript(f.read())
     with open("sql/functions/prepare_documentation.sql") as f:
-        db.executescript(f.read())
+        cur.execute(f.read(), {"after_epoch": after_epoch})
     with open("sql/functions/get_documentation.sql") as f:
-        data = cur.execute(f.read(), {"after_epoch": after_epoch}).fetchall()
+        data = cur.execute(f.read()).fetchall()
     cur.close()
     db.close()
 

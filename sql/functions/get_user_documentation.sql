@@ -4,7 +4,7 @@
 -- You MUST call prepare_documentation.sql AND prepare_user_documentation.sql 
 -- before this to avoid getting stale data.
 
--- Arguments: {after_epoch}
+-- Arguments: None
 
 -- For some unholy reason SQLite throws a syntax error if I put parentheses
 -- arount this SELECT clause
@@ -23,5 +23,4 @@ SELECT
 FROM ping_groups 
 LEFT JOIN ping_count ON ping_groups.group_id = ping_count.group_id
 LEFT JOIN user_subscriptions on ping_groups.group_id = user_subscriptions.group_id
-WHERE ping_groups.created_epoch_sec > :after_epoch
-AND ping_groups.hidden < 1;
+WHERE ping_groups.hidden < 1;
