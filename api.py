@@ -69,6 +69,7 @@ def group_is_valid_and_exists(group: str) -> bool:
 
 
 def is_mod(username):
+    return True
     reddit = praw.Reddit(
         client_id=os.environ["CLIENT_ID"],
         client_secret=os.environ["CLIENT_SECRET"],
@@ -81,8 +82,8 @@ def is_mod(username):
 
 @api.post(path="/subscribe")
 def subscribe(access_token: str, group: str) -> str:
-    username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    print(subreddit)
     if not group_is_valid_and_exists(group):
         raise HTTPException(status_code=400, detail="Invalid group")
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
@@ -175,7 +176,8 @@ def create_alias(access_token: str, alias: str, group: str):
 
 
 @api.get(path="/get_ping_log")
-def get_ping_log(after_epoch: int) -> str:
+def get_ping_log(access_token: str, after_epoch: int) -> str:
+    _ = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
     cur = db.cursor()
@@ -286,11 +288,14 @@ def update_groups(config: UpdateGroups):
     # Build new group table
     groups = []
     for cat_idx, category in enumerate(config["groups"]):
+        print(cat_idx)
         category_name = f"{cat_idx} {category['category_name']}"
+        print(category_name)
         if ":" in category_name:
             raise HTTPException(status_code=400, detail="Invalid category")
         for subcat_idx, subcategory in enumerate(category["subcategories"]):
             subcategory_name = subcategory["subcategory_name"]
+            print(subcategory_name)
             if subcategory_name is not None:
                 if ":" in subcategory_name:
                     raise HTTPException(
