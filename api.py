@@ -81,6 +81,7 @@ def is_mod(username):
 
 @api.post(path="/subscribe")
 def subscribe(access_token: str, group: str) -> str:
+    username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not group_is_valid_and_exists(group):
         raise HTTPException(status_code=400, detail="Invalid group")
