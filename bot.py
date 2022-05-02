@@ -199,7 +199,7 @@ class UserPinger:
                             for username 
                             in self.db.execute(f.read(), {"group_name": group})
                         ]
-                if str(comment.author) not in subscribers:
+                if str(comment.author).lower() not in subscribers:
                     self.logger.warning(
                         "%s not subscribed to %s", comment.id, group
                     )
