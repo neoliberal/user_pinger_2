@@ -176,8 +176,10 @@ def create_alias(access_token: str, alias: str, group: str):
 
 @api.get(path="/get_ping_log")
 def get_ping_log(access_token: str, after_epoch: int) -> str:
-    _ = get_user(access_token)
+    username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    if not is_mod(username):
+        raise HTTPException(status_code=403, detail="You must be a mod to get the ping log")
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
     cur = db.cursor()
     with db:
