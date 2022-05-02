@@ -25,6 +25,7 @@ api = FastAPI()
 
 @api.get(path="/me")
 def get_user(access_token: str) -> str:
+    raise HTTPException(status_code=401, detail="Invalid access token")
     """
     Returns the name of the Reddit user corresponding to the access token.
     There's probably a better way to do this in praw, but it eludes me
@@ -72,7 +73,7 @@ def alias_exists(alias: str) -> bool:
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
         with open("sql/functions/alias_exists.sql") as f:
-            exists = bool(db.execute(f.read(), {"alias_name": alias}).fetchall())
+            exists = bool(db.execute(f.read(), {"alias_name": alias}).fetchall()[0][0])
     if exists:
         return True
     return False
