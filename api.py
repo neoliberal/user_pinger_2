@@ -25,7 +25,6 @@ api = FastAPI()
 
 @api.get(path="/me")
 def get_user(access_token: str) -> str:
-    raise HTTPException(status_code=401, detail="Invalid access token")
     """
     Returns the name of the Reddit user corresponding to the access token.
     There's probably a better way to do this in praw, but it eludes me
