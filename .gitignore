@@ -3,3 +3,4 @@ __pycache__/
 api.sock
 sql/db/
 variables.env
+*.swp
