@@ -239,7 +239,7 @@ class UserPinger:
         log_data = {
             "comment_id": comment.id,
             "permalink": comment.permalink,
-            "author": str(comment.author),
+            "author": str(comment.author).lower(),
             "token": token,
             "created_epoch_sec": int(comment.created_utc)
         }
@@ -346,12 +346,12 @@ class UserPinger:
         if words == ["unsubscribe"]:
             with self.db:
                 with open("sql/functions/get_user_subscriptions.sql") as f:
-                    arg = {"username": str(message.author)}
+                    arg = {"username": str(message.author).lower()}
                     unsubscribed_groups = [
                         g[0] for g in self.db.execute(f.read(), arg).fetchall()
                     ]
                 with open("sql/functions/unsubscribe_user_from_all.sql") as f:
-                    arg = {"username": str(message.author)}
+                    arg = {"username": str(message.author).lower()}
                     self.db.execute(f.read(), arg)
             resubscribe_groups = "subscribe " + "%26".join(unsubscribed_groups)
             with open("templates/unsubscribed_from_all.txt") as f:
@@ -372,7 +372,7 @@ class UserPinger:
         if words[0] == "list_my_subscriptions":
             with self.db:
                 with open("sql/functions/get_user_subscriptions.sql") as f:
-                    arg = {"username": str(message.author)}
+                    arg = {"username": str(message.author).lower()}
                     groups = [
                         s[0] for s in self.db.execute(f.read(), arg).fetchall()
                     ]
@@ -450,7 +450,7 @@ class UserPinger:
                 with self.db:
                     with open("sql/functions/unsubscribe_user_from_group.sql") as f:
                         arg = {
-                            "username": str(message.author),
+                            "username": str(message.author).lower(),
                             "group_name": group
                         }
                         self.db.execute(f.read(), arg)
