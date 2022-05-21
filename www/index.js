@@ -628,10 +628,6 @@ function edit_group_hidden (e) {
     build_group_table(groups);
 }
 
-
-// TODO clean up this mess
-
-
 function build_group_table(groups) {
 
     // If groups have been edited prompt to save
