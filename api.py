@@ -2,8 +2,6 @@
 # Then set up the unit tests so they make calls to the API using
 # requests-unixsocket on pypi
 
-# TODO logging
-
 from itertools import groupby
 import os
 import re
@@ -173,6 +171,7 @@ def create_alias(access_token: str, alias: str, group: str):
     if alias_exists(alias):
         raise HTTPException(status_code=400, detail="Cannot create an alias that already exists")
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
+
     with db:
         with open("sql/functions/init_db.sql") as f:
             db.executescript(f.read())
@@ -291,9 +290,6 @@ def update_groups(config: UpdateGroups):
     if not is_mod(username):
         raise HTTPException(status_code=403, detail="You must be a mod")
     
-    # TODO make sure that simultaneous edits don't screw things up
-    # TODO validate
-    # TODO call update_wiki
     # Build new group table
     groups = []
     for cat_idx, category in enumerate(config["groups"]):
