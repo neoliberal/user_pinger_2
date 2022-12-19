@@ -1,23 +1,78 @@
 <!--
-Hello, if you're looking at my code, please let me know if you find any issues.
+STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
 -->
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Manage Subscriptions</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Deep State HQ</title>
+    <link rel="stylesheet" href="./index.css">
+
+    <link rel="stylesheet" href="/common.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
 </head>
 
+
 <body>
+
+    <!-- Banner is boilerplate, any changes should be applied to all pages -->
     <div id="banner">
-        <div id="page-title">Manage Pings</div>
-        <button id="toggle-mod-mode" class="bad-input" onclick="toggle_mod_mode()">Enable Mod Mode</button>
+        <div id="website-title"><a href="https://neoliber.al">Neoliberal</a></div>
+        <input id="menu-btn" type="checkbox">
+        <label id="menu-icon" for="menu-btn">
+            <span class="navicon"></span>
+        </label>
+        <ul id="menu">
+            <li>
+                <a class="submenu-name" href="/tools">Tools</a>
+                <input id="submenu-tools-btn" class="submenu-btn" type="checkbox">
+                <label class="submenu-icon" for="submenu-tools-btn">
+                    <span class="submenu-navicon"></span>
+                </label>
+                <ul class="submenu">
+                    <li><a href="/user_pinger_2">User Pinger 2</a></li>
+                    <li><a href="/dt">Discussion Thread</a></li>
+                    <li><a href="/political_quiz">Ideology Quiz</a></li>
+                </ul>
+            </li>
+            <li>
+                <a class="submenu-name" href="/community">Community</a>
+                <input id="submenu-community-btn" class="submenu-btn" type="checkbox">
+                <label class="submenu-icon" for="submenu-community-btn">
+                    <span class="submenu-navicon"></span>
+                </label>
+                <ul class="submenu">
+                    <li><a href="https://cnliberalism.org">Center For New Liberalism</a></li>
+                    <li><a href="https://reddit.com/r/neoliberal">/r/neoliberal</a></li>
+                    <li><a href="https://github.com/neoliberal">Github</a></li>
+                </ul>
+            </li>
+            <li>
+                <a class="submenu-name" href="/about">About</a>
+                <input id="submenu-about-btn" class="submenu-btn" type="checkbox">
+                <label class="submenu-icon" for="submenu-about-btn">
+                    <span class="submenu-navicon"></span>
+                </label>
+                <ul class="submenu">
+                    <li><a href="/about/privacy_policy.html">Privacy Policy</a></li>
+                    <li><a href="/about/settings.html">Settings</a></li>
+                    <li><a href="/about/contact.html">Contact</a></li>
+                </ul>
+            </li>
+        </ul>
     </div>
+
+    <!-- All individual webpage stuff should go in content -->
     <div id="content">
         <div id="description">
+            <button id="toggle-mod-mode" class="bad-input" onclick="toggle_mod_mode()">
+                Enable Mod Mode
+            </button>
             <div id="welcome">
             </div>
             <div id="description">
@@ -55,15 +110,16 @@ Hello, if you're looking at my code, please let me know if you find any issues.
         </div>
         <div id="groups">
         </div>
+        <button id="save-prompt" style="display:none" onclick="update_groups()">
+            <span id="save-prompt-text">Save Changes</span>
+        </button>
+        <button id="discard-prompt" style="display:none" onclick="discard_changes()">Discard Changes</div>
+        <script type="text/javascript" src="index.js"></script>
     </div>
+
+    <!-- Footer is boilerplate, any changes should be applied to all pages -->
     <div id="footer">
-        <a href="https://github.com/neoliberal/user_pinger_2/">user_pinger_2</a>
         created by <a href="https://reddit.com/user/jenbanim">/u/jenbanim</a>
     </div>
-    <button id="save-prompt" style="display:none" onclick="update_groups()">
-        <span id="save-prompt-text">Save Changes</span>
-    </div>
-    <button id="discard-prompt" style="display:none" onclick="discard_changes()">Discard Changes</div>
-</body>
 
-<script type="text/javascript" src="index.js"></script>
+</body>
