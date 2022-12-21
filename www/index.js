@@ -1,11 +1,31 @@
 // Tired programmers can have a little global scope... as a treat
-let fixedURLParams = new URLSearchParams("?"+window.location.hash.slice(1));
-let access_token = fixedURLParams.get("access_token");
 let groups;
 let old_groups;
 let mod_mode = 0;
 
+// Save and use URL access token if exists
+// If not, try to use stored access access token
+// Of course Reddit returns a parameter string with broken formatting
+let fixedURLParams = new URLSearchParams("?"+window.location.hash.slice(1));
+let access_token = fixedURLParams.get("access_token");
+// How the fuck is this not built-in to JS? Copied from StackOverflow:
+// https://stackoverflow.com/a/25490531
+const getCookieValue = (name) => (
+  document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
+)
+// Only save our cookie if users have opted-in
+if (getCookieValue("user_pinger_2_remember_me") && access_token) {
+    document.cookie = "access_token = " + access_token + "; SameSite=Strict";
+}
+if (!access_token && getCookieValue("access_token")) {
+    access_token = getCookieValue("access_token");
+}
+// No access token in URL or cookies? send to login page
+if (!access_token) {
+    location.href = "login.html";
+}
 
+// __main__
 load_page();
 
 
@@ -37,6 +57,11 @@ function load_page() {
     });
 }
 
+
+function logout() {
+    document.cookie = "access_token = ";
+    location.href = "login.html";
+}
 
 // USER PAGE FUNCTIONS
 
