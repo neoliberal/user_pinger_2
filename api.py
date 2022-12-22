@@ -67,6 +67,7 @@ def group_is_valid_and_exists(group: str) -> bool:
         return False
     return True
 
+
 def alias_exists(alias: str) -> bool:
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
@@ -216,10 +217,26 @@ class UpdateGroups(TypedDict):
     groups: List[Category]
 
 
+@api.get(path="/list_user_groups")
+def list_user_groups(access_token:str, target_user:str) -> List[Category]:
+    """List a user's groups on the website"""
+    username = get_user(access_token)
+    if not is_mod(username):
+        raise HTTPException(status_code=403, detail="You must be a mod to view a user's subsriptions")
+    if not re.match("^[a-zA-Z0-9_-]{1,20}$", target_user):
+        raise HTTPException(status_code=400, detail="Invalid target user")
+    return get_groups(username, target_user)
+
+
 @api.get(path="/list_groups")
 def list_groups(access_token:str) -> List[Category]:
     """List the groups for display on the website"""
     username = get_user(access_token)
+    return get_groups(username, username)
+
+
+def get_groups(username: str, target_user:str) -> List[Category]:
+    """Get a users groups"""
     after_epoch = time.time() - 60*60*24*7
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
@@ -229,7 +246,7 @@ def list_groups(access_token:str) -> List[Category]:
     with open("sql/functions/prepare_documentation.sql") as f:
         cur.execute(f.read(), {"after_epoch": after_epoch})
     with open("sql/functions/prepare_user_documentation.sql") as f:
-        cur.execute(f.read(), {"username": username})
+        cur.execute(f.read(), {"username": target_user})
     if is_mod(username):
         with open("sql/functions/get_mod_documentation.sql") as f:
             data = cur.execute(f.read()).fetchall()
@@ -241,13 +258,13 @@ def list_groups(access_token:str) -> List[Category]:
     # TODO pit in pinglib? I use this twice
     categorized = [
         [
-            sorted(subgroup[1], key = lambda x: x[0]) 
-            for subgroup 
+            sorted(subgroup[1], key = lambda x: x[0])
+            for subgroup
             in groupby(
-                sorted(list(category[1]), key = lambda x: x[2].split(":")[-1][0]), 
+                sorted(list(category[1]), key = lambda x: x[2].split(":")[-1][0]),
                 lambda x: x[2].split(":")[-1][0]
             )
-        ] 
+        ]
         for category
         in groupby(sorted(data, key = lambda x: x[2]), lambda x: x[2][0])
     ]
@@ -255,7 +272,7 @@ def list_groups(access_token:str) -> List[Category]:
     for cat_idx, category in enumerate(categorized):
         category_name = category[0][0][2].split(":")[0][2:]
         doc.append({
-            "category_name": category_name, 
+            "category_name": category_name,
             "subcategories": []
         })
         for subcat_idx, subcategory in enumerate(category):
@@ -290,7 +307,7 @@ def update_groups(config: UpdateGroups):
     username = get_user(config["access_token"])
     if not is_mod(username):
         raise HTTPException(status_code=403, detail="You must be a mod")
-    
+
     # TODO make sure that simultaneous edits don't screw things up
     # TODO validate
     # TODO call update_wiki

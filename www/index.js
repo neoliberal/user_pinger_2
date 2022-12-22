@@ -5,6 +5,9 @@
 // old_groups is just here to check if changes have been made
 let groups;
 let old_groups;
+let target_user;
+let target_user_groups;
+let target_user_old_groups;
 let mod_mode;
 // Use URL access token if exists
 // Of course Reddit returns a parameter string with broken formatting
@@ -59,8 +62,36 @@ function load_page() {
                 document.getElementById("save-prompt").classList.remove("loading");
                 groups = data;
                 old_groups = JSON.parse(JSON.stringify(groups));
-                build_group_table(data);
+                build_group_table(groups, old_groups);
             });
+    });
+}
+
+
+function impersonate() {
+    document.getElementById("groups").innerHTML = "";
+    target_user = document.getElementById("target-user").value;
+    document.getElementById("target-user-name").innerHTML = `Viewing /u/${target_user}:`
+    list_user_groups(target_user);
+}
+
+
+function list_user_groups(target) {
+    fetch(
+        `api/list_user_groups?access_token=${access_token}&target_user=${target}`
+    ).then((response) => {
+        if (response.status != "200") {
+            alert("Unknown error fetching groups. Please contact support")
+        }
+        return response.json();
+    }).then((data) => {
+        document.getElementById("save-prompt").classList.remove("loading");
+        target_user_groups = data;
+        target_user_old_groups = JSON.parse(JSON.stringify(target_user_groups));
+        mod_mode = false;
+        target_user = target;
+        build_group_table(target_user_groups, target_user_old_groups);
+        mod_mode = true;
     });
 }
 
@@ -70,7 +101,8 @@ function load_page() {
 
 function toggle_mod_mode(checkbox) {
     mod_mode = checkbox.checked;
-    build_group_table(groups);
+    target_user = "";
+    build_group_table(groups, old_groups);
     toggle_all_tab();
     let els = document.getElementsByClassName("mod-only");
     for (var i = 0; i < els.length; i++) {
@@ -90,34 +122,37 @@ function toggle_mod_mode(checkbox) {
 
 function toggle_all_tab() {
     document.getElementById("all-mode-button").checked = true;
+    target_user = "";
     let all_tab_els = document.getElementsByClassName("all-tab");
     let group_tab_els = document.getElementsByClassName("group-tab");
     let user_tab_els = document.getElementsByClassName("user-tab");
-    for (var i = 0; i < all_tab_els.length; i++) {
-        all_tab_els[i].style.display = "";
-    }
     for (var i = 0; i < group_tab_els.length; i++) {
         group_tab_els[i].style.display = "none";
     }
     for (var i = 0; i < user_tab_els.length; i++) {
         user_tab_els[i].style.display = "none";
     }
+    for (var i = 0; i < all_tab_els.length; i++) {
+        all_tab_els[i].style.display = "";
+    }
+    build_group_table(groups, old_groups);
 }
 
 
 function toggle_group_tab(group=null) {
     document.getElementById("group-mode-button").checked = true;
+    target_user = "";
     let all_tab_els = document.getElementsByClassName("all-tab");
     let group_tab_els = document.getElementsByClassName("group-tab");
     let user_tab_els = document.getElementsByClassName("user-tab");
     for (var i = 0; i < all_tab_els.length; i++) {
         all_tab_els[i].style.display = "none";
     }
-    for (var i = 0; i < group_tab_els.length; i++) {
-        group_tab_els[i].style.display = "";
-    }
     for (var i = 0; i < user_tab_els.length; i++) {
         user_tab_els[i].style.display = "none";
+    }
+    for (var i = 0; i < group_tab_els.length; i++) {
+        group_tab_els[i].style.display = "";
     }
 }
 
@@ -136,6 +171,7 @@ function toggle_user_tab(user=null) {
     for (var i = 0; i < user_tab_els.length; i++) {
         user_tab_els[i].style.display = "";
     }
+    document.getElementById("groups").innerHTML = "";
 }
 
 
@@ -151,15 +187,27 @@ function logout() {
 function subscribe(group) {
     let group_manage_button = document.getElementById(`manage_button_${group}`);
     group_manage_button.onclick = function () {}; // Block input while loading
-    fetch(`api/subscribe?access_token=${access_token}&group=${group}`, {method: "POST"})
-        .then((response) => {
-            if (response.status == 200) {
-                group_manage_button.innerHTML = "Unsubscribe";
-                group_manage_button.onclick = function () {unsubscribe(group);};
-            } else {
-                alert("There was an error subscribing. Please contact support.");
-            }
-        })
+    if (target_user) {
+        fetch(`api/subscribe?access_token=${access_token}&user=${target_user}&group=${group}`, {method: "POST"})
+            .then((response) => {
+                if (response.status == 200) {
+                    group_manage_button.innerHTML = "Unsubscribe";
+                    group_manage_button.onclick = function () {unsubscribe(group);};
+                } else {
+                    alert("There was an error subscribing. Please contact support.");
+                }
+            })
+    } else {
+        fetch(`api/subscribe?access_token=${access_token}&group=${group}`, {method: "POST"})
+            .then((response) => {
+                if (response.status == 200) {
+                    group_manage_button.innerHTML = "Unsubscribe";
+                    group_manage_button.onclick = function () {unsubscribe(group);};
+                } else {
+                    alert("There was an error subscribing. Please contact support.");
+                }
+            })
+    }
 }
 
 
@@ -260,7 +308,7 @@ function validate_username(e) {
 // banner & footer buttons
 function discard_changes() {
     groups = JSON.parse(JSON.stringify(old_groups));
-    build_group_table(groups);
+    build_group_table(groups, old_groups);
 }
 
 
@@ -294,7 +342,7 @@ function move_category_up(category) {
     if (above) {
         groups[category_idx-1] = current;
         groups[category_idx] = above;
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     }
 }
 
@@ -311,7 +359,7 @@ function move_category_down(category) {
     if (below) {
         groups[category_idx+1] = current;
         groups[category_idx] = below;
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     }
 }
 
@@ -323,7 +371,7 @@ function add_category() {
         }
     }
     groups.splice(0, 0, {"category_name": null, "subcategories": []});
-    build_group_table(groups)
+    build_group_table(groups, old_groups)
 }
 
 
@@ -352,7 +400,7 @@ function edit_category_name(e) {
     }
     if (valid_name) {
         groups[category_idx]["category_name"] = e.target.value;
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     } else {
         e.target.parentElement.classList.add("bad-input");
     }
@@ -392,14 +440,14 @@ function move_subcategory_up(category, subcategory) {
             let last_subcat = groups[category_idx-1]["subcategories"].length;
             groups[category_idx]["subcategories"].splice(subcategory_idx, 1);
             groups[category_idx-1]["subcategories"].splice(last_subcat, 0, current);
-            build_group_table(groups);
+            build_group_table(groups, old_groups);
         }
         // move to next subcategory up
     } else {
         let above = groups[category_idx]["subcategories"][subcategory_idx-1]
         groups[category_idx]["subcategories"][subcategory_idx-1]= current;
         groups[category_idx]["subcategories"][subcategory_idx] = above;
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     }
 }
 
@@ -435,14 +483,14 @@ function move_subcategory_down(category, subcategory) {
             }
             groups[category_idx]["subcategories"].splice(subcategory_idx, 1);
             groups[category_idx+1]["subcategories"].splice(0, 0, current);
-            build_group_table(groups);
+            build_group_table(groups, old_groups);
         }
         // move to next subcategory
     } else {
         let below = groups[category_idx]["subcategories"][subcategory_idx+1]
         groups[category_idx]["subcategories"][subcategory_idx+1]= current;
         groups[category_idx]["subcategories"][subcategory_idx] = below;
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     }
 }
 
@@ -460,7 +508,7 @@ function add_subcategory(category) {
             return;
     }
     groups[category_idx]["subcategories"].splice(0, 0, {"subcategory_name": null, "groups": []});
-    build_group_table(groups);
+    build_group_table(groups, old_groups);
 }
 
 
@@ -504,7 +552,7 @@ function edit_subcategory_name(e) {
             target = null;
         }
         groups[category_idx]["subcategories"][subcategory_idx]["subcategory_name"] = target;
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     } else {
         e.target.parentElement.classList.add("bad-input");
     }
@@ -540,13 +588,13 @@ function move_group_up(group_id) {
             let last_subcat = groups[category_index-1]["subcategories"].length-1;
             groups[category_index]["subcategories"][subcategory_index]["groups"].splice(group_index, 1);
             groups[category_index-1]["subcategories"][last_subcat]["groups"].splice(0, 0, group);
-            build_group_table(groups);
+            build_group_table(groups, old_groups);
         }
     } else {
         // move to next subcategory up
         groups[category_index]["subcategories"][subcategory_index]["groups"].splice(group_index, 1);
         groups[category_index]["subcategories"][subcategory_index-1]["groups"].splice(0, 0, group);
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     }
 }
 
@@ -578,13 +626,13 @@ function move_group_down(group_id) {
             // move to next category down
             groups[category_index]["subcategories"][subcategory_index]["groups"].splice(group_index, 1);
             groups[category_index+1]["subcategories"][0]["groups"].splice(0, 0, group);
-            build_group_table(groups);
+            build_group_table(groups, old_groups);
         }
     } else {
         // pop to next subcategory down
         groups[category_index]["subcategories"][subcategory_index]["groups"].splice(group_index, 1);
         groups[category_index]["subcategories"][subcategory_index+1]["groups"].splice(0, 0, group);
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     }
 }
 
@@ -618,7 +666,7 @@ function add_group(category, subcategory) {
     new_group_id = Math.max(...group_ids) + 1;
     let new_group = [0, "", "", 0, 0, 0, 0, new_group_id];
     groups[category_idx]["subcategories"][subcategory_idx]["groups"].splice(0, 0, new_group);
-    build_group_table(groups);
+    build_group_table(groups, old_groups);
 }
 
 
@@ -654,7 +702,7 @@ function edit_group_name(e) {
     }
     if (valid_name) {
         groups[category_index]["subcategories"][subcategory_index]["groups"][group_index][1] = new_name;
-        build_group_table(groups);
+        build_group_table(groups, old_groups);
     } else {
         e.target.parentElement.classList.add("bad-input");
     }
@@ -678,7 +726,7 @@ function edit_group_description(e) {
             }
         }
     }
-    build_group_table(groups);
+    build_group_table(groups, old_groups);
 }
 
 function edit_group_protected (e) {
@@ -692,7 +740,7 @@ function edit_group_protected (e) {
             }
         }
     }
-    build_group_table(groups);
+    build_group_table(groups, old_groups);
 }
 
 function edit_group_locked (e) {
@@ -706,7 +754,7 @@ function edit_group_locked (e) {
             }
         }
     }
-    build_group_table(groups);
+    build_group_table(groups, old_groups);
 }
 
 function edit_group_hidden (e) {
@@ -720,14 +768,14 @@ function edit_group_hidden (e) {
             }
         }
     }
-    build_group_table(groups);
+    build_group_table(groups, old_groups);
 }
 
 
 // TODO clean up this mess
 
 
-function build_group_table(groups) {
+function build_group_table(groups, old_groups) {
 
     // If groups have been edited prompt to save
     let save_prompt = document.getElementById("save-prompt");
@@ -887,7 +935,7 @@ function build_group_table(groups) {
                     group_manage.onclick = function () {unsubscribe(group[1]);};
                 } else {
                     if (group_protected) {
-                        if (!mod_mode) {
+                        if (!mod_mode && !target_user) {
                             group_manage.classList.add("bad-input");
                             group_manage.appendChild(document.createTextNode("Protected"));
                         } else {

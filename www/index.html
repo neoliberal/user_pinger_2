@@ -95,7 +95,7 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
             <div id="welcome"></div>
             <div>
                 <p>You can manage your subscriptions on this page.</p>
-                <p>You need mod approval to subscribe to a protected group. Message the mods to request access.</p>
+                <p>You need mod approval to subscribe to a protected group. Message the mods to request access. (TODO add link. API?)</p>
                 <ul>
                     <li>
                         &#x1F4E9; Activity: how many pings the group has received in the last 7 days
@@ -103,15 +103,14 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
                 </ul>
             </div>
         </div>
-        <div id="groups" class="all-tab"></div>
         <div class="group-tab" style="display: none;">
+            <p>Select a group to edit <input><button>Go</button></p>
             <p>No need to delete groups, just set locked, protected, and hidden</p>
             <ul>
                 <li>&#x270B; Protected: only mods can subscribe</li>
                 <li>&#x1F512; Locked: only mods can ping</li>
                 <li>&#x1F648; Hidden: group does not appear in documentation (except to mods)</li>
             </ul>
-            <p>Select a group to moderate <input><button>Go</button></p>
             <ul>
                 <li>Show list of subscribers, allow (un)subscribe</li>
                 <li>Change protected, locked, hidden</li>
@@ -126,17 +125,17 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
             -->
         </div>
         <div class="user-tab" style="display: none;">
-            <p>Select a user to moderate <input><button>Go</button></p>
-            <p>
-                Subscribe <input id="subscribe_user_name" onchange="validate_username(this)" value="user" autocomplete="off">
-                to <input id="subscribe_user_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
-                <button onclick="subscribe_user_to_group()">submit</button>
-            </p>
-            <ul>
-                <li>Show user's subscriptions, allow (un)subscribe</li>
-                <li>unsubscribe all</li>
-            </ul>
+            <div>
+                <p>
+                    Select a user to impersonate
+                    <input id="target-user"><button onclick="impersonate()">Go</button>
+                </p>
+            </div>
+            <div>
+                <h1 id="target-user-name"></h1>
+            </div>
         </div>
+        <div id="groups" class="all-tab user-tab"></div>
         <button id="save-prompt" style="display:none" onclick="update_groups()">
             <span id="save-prompt-text">Save Changes</span>
         </button>
