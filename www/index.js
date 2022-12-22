@@ -188,7 +188,7 @@ function subscribe(group) {
     let group_manage_button = document.getElementById(`manage_button_${group}`);
     group_manage_button.onclick = function () {}; // Block input while loading
     if (target_user) {
-        fetch(`api/subscribe?access_token=${access_token}&user=${target_user}&group=${group}`, {method: "POST"})
+        fetch(`api/subscribe_user?access_token=${access_token}&user=${target_user}&group=${group}`, {method: "POST"})
             .then((response) => {
                 if (response.status == 200) {
                     group_manage_button.innerHTML = "Unsubscribe";
@@ -214,15 +214,27 @@ function subscribe(group) {
 function unsubscribe(group) {
     let group_manage_button = document.getElementById(`manage_button_${group}`);
     group_manage_button.onclick = function () {}; // Block input while loading
-    fetch(`api/unsubscribe?access_token=${access_token}&group=${group}`, {method: "POST"})
-        .then((response) => {
-            if (response.status == 200) {
-                group_manage_button.innerHTML = "Subscribe";
-                group_manage_button.onclick = function () {subscribe(group);};
-            } else {
-                alert("There was an error unsubscribing. Please contact support.");
-            }
-        })
+    if (target_user) {
+        fetch(`api/unsubscribe_user?access_token=${access_token}&user=${target_user}&group=${group}`, {method: "POST"})
+            .then((response) => {
+                if (response.status == 200) {
+                    group_manage_button.innerHTML = "Subscribe";
+                    group_manage_button.onclick = function () {subscribe(group);};
+                } else {
+                    alert("There was an error subscribing. Please contact support.");
+                }
+            })
+    } else {
+        fetch(`api/unsubscribe?access_token=${access_token}&group=${group}`, {method: "POST"})
+            .then((response) => {
+                if (response.status == 200) {
+                    group_manage_button.innerHTML = "Subscribe";
+                    group_manage_button.onclick = function () {subscribe(group);};
+                } else {
+                    alert("There was an error unsubscribing. Please contact support.");
+                }
+            })
+    }
 }
 
 

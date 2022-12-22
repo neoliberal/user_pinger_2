@@ -161,6 +161,29 @@ def subscribe_user(access_token: str, user: str, group:str) -> str:
     return "success"
 
 
+@api.post(path="/unsubscribe_user")
+def unsubscribe_user(access_token: str, user: str, group:str) -> str:
+    username = get_user(access_token)
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    if not is_mod(username):
+        raise HTTPException(status_code=403, detail="You must be a mod")
+    if not re.match("^[a-zA-Z0-9_-]{1,20}$", user):
+        raise HTTPException(status_code=400, detail="Invalid user")
+    if not group_is_valid_and_exists(group):
+        raise HTTPException(status_code=400, detail="Invalid group")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
+    with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
+        with open("sql/functions/unsubscribe_user_from_group.sql") as f:
+            arg = {
+                "username": user.lower(),
+                "group_name": group,
+            }
+            db.execute(f.read(), arg)
+    return "success"
+
+
 @api.post(path="/create_alias")
 def create_alias(access_token: str, alias: str, group: str):
     username = get_user(access_token)
