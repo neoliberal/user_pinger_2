@@ -8,6 +8,7 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
 <head>
     <title>Deep State HQ</title>
     <link rel="stylesheet" href="./index.css">
+    <script type="text/javascript" src="index.js" defer></script>
 
     <link rel="stylesheet" href="/common.css">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -69,55 +70,77 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
 
     <!-- All individual webpage stuff should go in content -->
     <div id="content">
-        <div id="description">
-            <button id="toggle-mod-mode" class="bad-input" onclick="toggle_mod_mode()">
-                Enable Mod Mode
-            </button>
+        <div id="tabs">
+            <div>
+                <input type="checkbox" id="toggle-mod-mode" onclick="toggle_mod_mode(this)">
+                <label for="toggle-mod-mode">Mod Mode</label>
+            </div>
+            <div class="mod-only" style="display:none">
+                <input type="radio" name="tabs" id="all-mode-button" onchange="toggle_all_tab()">
+                <label for="all-mode-button">All</label>
+            </div>
+            <div class="mod-only" style="display:none">
+                <input type="radio" name="tabs" id="group-mode-button" onchange="toggle_group_tab()">
+                <label for="group-mode-button">Group</label>
+            </div>
+            <div class="mod-only" style="display:none">
+                <input type="radio" name="tabs" id="user-mode-button" onchange="toggle_user_tab()">
+                <label for="user-mode-button">User</label>
+            </div>
             <button id="logout" onclick="logout()">
                 Logout
             </button>
-            <div id="welcome">
-            </div>
-            <div id="description">
+        </div>
+        <div id="description" class="all-tab">
+            <div id="welcome"></div>
+            <div>
                 <p>You can manage your subscriptions on this page.</p>
                 <p>You need mod approval to subscribe to a protected group. Message the mods to request access.</p>
                 <ul>
-                    <li class="mod-only" style="display:none">
-                        &#x270B; Protected: only mods can subscribe
-                    </li>
-                    <li class="mod-only" style="display:none">
-                        &#x1F512; Locked: only mods can ping
-                    </li>
-                    <li class="mod-only" style="display:none">
-                        &#x1F648; Hidden: group does not appear in documentation (except to mods)
-                    </li>
                     <li>
                         &#x1F4E9; Activity: how many pings the group has received in the last 7 days
                     </li>
                 </ul>
             </div>
-            <div id="mod-help" class="mod-only" style="display:none">
-                <h2>Mod Functions</h2>
-                    <p>No need to delete groups, just set locked, protected, and hidden. Use the "subscribe user" boxes above to subscribe either yourself or someone else to a protected group.</p>
-                    <p>
-                        Subscribe <input id="subscribe_user_name" onchange="validate_username(this)" value="user" autocomplete="off">
-                        to <input id="subscribe_user_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
-                        <button onclick="subscribe_user_to_group()">submit</button>
-                    </p>
-                    <p>
-                        Create <input id ="create_alias_name" onchange="validate_alias(this)" value="ALIAS" autocomplete="off">
-                        pointing to <input id="create_alias_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
-                        <button onclick="create_alias()">submit</button>
-                    </p>
-            </div>
         </div>
-        <div id="groups">
+        <div id="groups" class="all-tab"></div>
+        <div class="group-tab" style="display: none;">
+            <p>No need to delete groups, just set locked, protected, and hidden</p>
+            <ul>
+                <li>&#x270B; Protected: only mods can subscribe</li>
+                <li>&#x1F512; Locked: only mods can ping</li>
+                <li>&#x1F648; Hidden: group does not appear in documentation (except to mods)</li>
+            </ul>
+            <p>Select a group to moderate <input><button>Go</button></p>
+            <ul>
+                <li>Show list of subscribers, allow (un)subscribe</li>
+                <li>Change protected, locked, hidden</li>
+                <li>Create group alias</li>
+            </ul>
+            <!--
+            <p>
+                Create <input id ="create_alias_name" onchange="validate_alias(this)" value="ALIAS" autocomplete="off">
+                pointing to <input id="create_alias_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
+                <button onclick="create_alias()">submit</button>
+            </p>
+            -->
+        </div>
+        <div class="user-tab" style="display: none;">
+            <p>Select a user to moderate <input><button>Go</button></p>
+            <p>
+                Subscribe <input id="subscribe_user_name" onchange="validate_username(this)" value="user" autocomplete="off">
+                to <input id="subscribe_user_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
+                <button onclick="subscribe_user_to_group()">submit</button>
+            </p>
+            <ul>
+                <li>Show user's subscriptions, allow (un)subscribe</li>
+                <li>unsubscribe all</li>
+            </ul>
         </div>
         <button id="save-prompt" style="display:none" onclick="update_groups()">
             <span id="save-prompt-text">Save Changes</span>
         </button>
         <button id="discard-prompt" style="display:none" onclick="discard_changes()">Discard Changes</div>
-        <script type="text/javascript" src="index.js"></script>
     </div>
 
     <!-- Footer is boilerplate, any changes should be applied to all pages -->

@@ -1,10 +1,12 @@
+// Page loading stuff goes at the top here
+
+
 // Tired programmers can have a little global scope... as a treat
+// old_groups is just here to check if changes have been made
 let groups;
 let old_groups;
-let mod_mode = 0;
-
-// Save and use URL access token if exists
-// If not, try to use stored access access token
+let mod_mode;
+// Use URL access token if exists
 // Of course Reddit returns a parameter string with broken formatting
 let fixedURLParams = new URLSearchParams("?"+window.location.hash.slice(1));
 let access_token = fixedURLParams.get("access_token");
@@ -13,10 +15,12 @@ let access_token = fixedURLParams.get("access_token");
 const getCookieValue = (name) => (
   document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
 )
-// Only save our cookie if users have opted-in
+// Save URL access token if we have one, and users have opted in
+// Fun fact, this checkbox means I don't need a "we use cookies" popup for GDPR compliance
 if (getCookieValue("user_pinger_2_remember_me") && access_token) {
     document.cookie = "access_token = " + access_token + "; SameSite=Strict";
 }
+// If we don't have an access token use our saved one
 if (!access_token && getCookieValue("access_token")) {
     access_token = getCookieValue("access_token");
 }
@@ -25,11 +29,14 @@ if (!access_token) {
     location.href = "login.html";
 }
 
-// __main__
+// Apparently this is halal now, provided you defer the script
+// No more window.onload
 load_page();
 
 
 function load_page() {
+    document.getElementById("toggle-mod-mode").checked = false;
+    document.getElementById("all-mode-button").checked = true;
     fetch(
         `api/me?access_token=${access_token}`
     ).then((response) => {
@@ -58,10 +65,85 @@ function load_page() {
 }
 
 
+// TAB BAR FUNCTIONS
+
+
+function toggle_mod_mode(checkbox) {
+    mod_mode = checkbox.checked;
+    build_group_table(groups);
+    toggle_all_tab();
+    let els = document.getElementsByClassName("mod-only");
+    for (var i = 0; i < els.length; i++) {
+        els[i].style.display = els[i].style.display == "none" ? "" : "none";
+    }
+}
+
+
+// input radio button onchange events don't fire when they are unchecked
+// hence why each of these functions hides the contents of other tabs.
+// That's stupid, right? Unchecking is a change, why wouldn't it fire?
+//
+// "Ah yes, radio buttons, what a convenient way to have several
+// mutually-exclusive webpage states"
+// -me, a fucking moron apparently
+
+
+function toggle_all_tab() {
+    document.getElementById("all-mode-button").checked = true;
+    let all_tab_els = document.getElementsByClassName("all-tab");
+    let group_tab_els = document.getElementsByClassName("group-tab");
+    let user_tab_els = document.getElementsByClassName("user-tab");
+    for (var i = 0; i < all_tab_els.length; i++) {
+        all_tab_els[i].style.display = "";
+    }
+    for (var i = 0; i < group_tab_els.length; i++) {
+        group_tab_els[i].style.display = "none";
+    }
+    for (var i = 0; i < user_tab_els.length; i++) {
+        user_tab_els[i].style.display = "none";
+    }
+}
+
+
+function toggle_group_tab(group=null) {
+    document.getElementById("group-mode-button").checked = true;
+    let all_tab_els = document.getElementsByClassName("all-tab");
+    let group_tab_els = document.getElementsByClassName("group-tab");
+    let user_tab_els = document.getElementsByClassName("user-tab");
+    for (var i = 0; i < all_tab_els.length; i++) {
+        all_tab_els[i].style.display = "none";
+    }
+    for (var i = 0; i < group_tab_els.length; i++) {
+        group_tab_els[i].style.display = "";
+    }
+    for (var i = 0; i < user_tab_els.length; i++) {
+        user_tab_els[i].style.display = "none";
+    }
+}
+
+
+function toggle_user_tab(user=null) {
+    document.getElementById("user-mode-button").checked = true;
+    let all_tab_els = document.getElementsByClassName("all-tab");
+    let group_tab_els = document.getElementsByClassName("group-tab");
+    let user_tab_els = document.getElementsByClassName("user-tab");
+    for (var i = 0; i < all_tab_els.length; i++) {
+        all_tab_els[i].style.display = "none";
+    }
+    for (var i = 0; i < group_tab_els.length; i++) {
+        group_tab_els[i].style.display = "none";
+    }
+    for (var i = 0; i < user_tab_els.length; i++) {
+        user_tab_els[i].style.display = "";
+    }
+}
+
+
 function logout() {
     document.cookie = "access_token = ";
     location.href = "login.html";
 }
+
 
 // USER PAGE FUNCTIONS
 
@@ -196,18 +278,6 @@ function update_groups() {
             load_page();
         }
     });
-}
-
-
-function toggle_mod_mode() {
-    mod_mode = !mod_mode;
-    let mod_mode_button = document.getElementById("toggle-mod-mode");
-    mod_mode_button.innerHTML = mod_mode_button.innerHTML == "Enable Mod Mode"? "Disable Mod Mode": "Enable Mod Mode";
-    build_group_table(groups);
-    let els = document.getElementsByClassName("mod-only");
-    for (var i = 0; i < els.length; i++) {
-        els[i].style.display = els[i].style.display == "none" ? "" : "none";
-    }
 }
 
 
