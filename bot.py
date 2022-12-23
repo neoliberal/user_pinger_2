@@ -106,6 +106,9 @@ class UserPinger:
             # no trigger
             self.parsed.append(comment.id)
             return
+        # TODO
+        # Swtich to regex matching? Could be faster and could easily handle
+        # punctuation surrounding !ping, as in [!ping foo](https://bar.com)
         if comment_split.count("!PING") > 1:
             self.logger.warning("%s Too many \"!pings\"", comment.id)
             self.parsed.append(comment.id)
