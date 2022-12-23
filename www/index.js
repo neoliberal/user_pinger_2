@@ -21,7 +21,7 @@ const getCookieValue = (name) => (
 // Save URL access token if we have one, and users have opted in
 // Fun fact, this checkbox means I don't need a "we use cookies" popup for GDPR compliance
 if (getCookieValue("user_pinger_2_remember_me") && access_token) {
-    document.cookie = "access_token = " + access_token + "; SameSite=Strict";
+    document.cookie = "access_token = " + access_token + "; SameSite=Strict; Secure";
 }
 // If we don't have an access token use our saved one
 if (!access_token && getCookieValue("access_token")) {
@@ -181,7 +181,7 @@ function toggle_user_tab(user=null) {
 
 
 function logout() {
-    document.cookie = "access_token = ";
+    document.cookie = "access_token = ; SameSite=Strict; Secure";
     location.href = "login.html";
 }
 

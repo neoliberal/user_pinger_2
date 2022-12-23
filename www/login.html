@@ -88,13 +88,13 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
         </div>
         <script>
             document.getElementById("remember_me").checked = false;
-            document.cookie = "user_pinger_2_remember_me = ";
-            document.cookie = "access_token = ";
+            document.cookie = "user_pinger_2_remember_me = ; SameSite=Strict; Secure";
+            document.cookie = "access_token = ; SameSite=Strict; Secure";
             function remember_me(checkbox) {
                 if (checkbox.checked){
-                    document.cookie = "user_pinger_2_remember_me = true";
+                    document.cookie = "user_pinger_2_remember_me = true; SameSite=Strict; Secure";
                 } else {
-                    document.cookie = "user_pinger_2_remember_me = false";
+                    document.cookie = "user_pinger_2_remember_me = false; SameSite=Strict; Secure";
                     document.cookie = "access_token = ";
                 }
             }
