@@ -172,6 +172,11 @@ function toggle_user_tab(user=null) {
         user_tab_els[i].style.display = "";
     }
     document.getElementById("groups").innerHTML = "";
+    if (user) {
+        document.getElementById("target-user").value = user;
+        document.getElementById("target-user-name").innerHTML = `Viewing /u/${user}:`
+        list_user_groups(user);
+    }
 }
 
 
