@@ -96,7 +96,9 @@ function list_user_groups(target) {
 }
 
 
-function moderate_group(group) {
+function moderate_group() {
+    group = document.getElementById("group-to-mod").value;
+    list_group_subscribers(group);
 }
 
 
