@@ -104,25 +104,28 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
             </div>
         </div>
         <div class="group-tab" style="display: none;">
-            <p>Select a group to edit <input><button>Go</button></p>
-            <p>No need to delete groups, just set locked, protected, and hidden</p>
-            <ul>
-                <li>&#x270B; Protected: only mods can subscribe</li>
-                <li>&#x1F512; Locked: only mods can ping</li>
-                <li>&#x1F648; Hidden: group does not appear in documentation (except to mods)</li>
-            </ul>
-            <ul>
-                <li>Show list of subscribers, allow (un)subscribe</li>
-                <li>Change protected, locked, hidden</li>
-                <li>Create group alias</li>
-            </ul>
-            <!--
-            <p>
-                Create <input id ="create_alias_name" onchange="validate_alias(this)" value="ALIAS" autocomplete="off">
-                pointing to <input id="create_alias_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
-                <button onclick="create_alias()">submit</button>
-            </p>
-            -->
+            <div>
+                <p>Select a group to edit <input><button>Go</button></p>
+                <p>No need to delete groups, just set locked, protected, and hidden</p>
+                <ul>
+                    <li>&#x270B; Protected: only mods can subscribe</li>
+                    <li>&#x1F512; Locked: only mods can ping</li>
+                    <li>&#x1F648; Hidden: group does not appear in documentation (except to mods)</li>
+                </ul>
+                <ul>
+                    <li>Show list of subscribers, allow (un)subscribe</li>
+                    <li>Change protected, locked, hidden</li>
+                    <li>Create group alias</li>
+                </ul>
+                <!--
+                <p>
+                    Create <input id ="create_alias_name" onchange="validate_alias(this)" value="ALIAS" autocomplete="off">
+                    pointing to <input id="create_alias_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
+                    <button onclick="create_alias()">submit</button>
+                </p>
+                -->
+            </div>
+            <div id="subscribers"></div>
         </div>
         <div class="user-tab" style="display: none;">
             <div>

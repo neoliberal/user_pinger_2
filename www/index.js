@@ -96,6 +96,26 @@ function list_user_groups(target) {
 }
 
 
+function moderate_group(group) {
+}
+
+
+function list_group_subscribers(group) {
+    fetch(`api/get_group_subscribers?access_token=${access_token}&group=${group}`, {method: "GET"})
+        .then((response) => {
+                if (response.status == 200) {
+                    console.log("success")
+                    return response.json()
+                }
+        }).then ((data) => {
+            build_subscriber_table(data);
+        })
+}
+
+function build_subscriber_table(subscribers) {
+    console.log(subscribers)
+}
+
 // TAB BAR FUNCTIONS
 
 
@@ -242,6 +262,13 @@ function unsubscribe(group) {
     }
 }
 
+
+function subscribe_user(user, group) {
+}
+
+
+function unsubscribe_user(user, group) {
+}
 
 
 // MOD PAGE FUNCTIONS

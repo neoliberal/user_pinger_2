@@ -224,6 +224,27 @@ def get_ping_log(after_epoch: int) -> str:
     return ping_log
 
 
+@api.get(path="/get_group_subscribers")
+def get_group_subscribers(access_token:str, group):
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    username = get_user(access_token)
+    if not is_mod(username):
+        raise HTTPException(status_code=403, detail="You must be a mod to create an alias")
+    if not group_is_valid_and_exists(group):
+        raise HTTPException(status_code=400, detail="Invalid group")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
+    cur = db.cursor()
+    with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
+        with open("sql/functions/get_group_subscribers.sql") as f:
+            arg = {"group_name": group}
+            subscribers = cur.execute(f.read(), arg).fetchall()
+    db.close()
+    print(subscribers)
+    return subscribers
+
+
 
 class SubCategory(TypedDict):
     subcategory_name: Union[str, None]
