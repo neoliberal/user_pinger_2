@@ -190,6 +190,8 @@ def create_alias(access_token: str, alias: str, group: str) -> str:
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not is_mod(username):
         raise HTTPException(status_code=403, detail="You must be a mod to create an alias")
+    alias = alias.upper()
+    group = de_alias_group(group)
     if not pinglib.group_name_is_valid(alias):
         raise HTTPException(status_code=400, detail="Invalid alias")
     if not group_is_valid_and_exists(group):
@@ -232,6 +234,7 @@ def delete_alias(access_token: str, alias: str) -> str:
 
 @api.get(path="/de_alias_group")
 def de_alias_group(alias: str) -> str:
+    alias = alias.upper()
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not group_is_valid_and_exists(alias):
         raise HTTPException(status_code=400, detail="Invalid group")

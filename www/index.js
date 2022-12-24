@@ -155,6 +155,7 @@ function build_alias_table(group, aliases) {
     const create_alias_div = document.createElement("div");
     const create_alias_input = document.createElement("input");
     create_alias_input.id = "create_alias_group";
+    create_alias_input.onchange = validate_alias;
     create_alias_div.append(create_alias_input);
     const create_alias_button = document.createElement("button");
     create_alias_button.append(document.createTextNode("Create alias"));
@@ -538,11 +539,11 @@ function validate_group(e) {
 
 
 function validate_alias(e) {
-    let alias = e.value;
-    if (!alias.match(/^[A-Z0-9-]+$/)) {
-        e.classList.add("bad-input");
+    const alias = e.target.value;
+    if (!alias.match(/^[a-zA-Z0-9-]+$/)) {
+        e.target.parentElement.classList.add("bad-input");
     }else{
-        e.classList.remove("bad-input");
+        e.target.parentElement.classList.remove("bad-input");
     }
 }
 
