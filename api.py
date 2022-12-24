@@ -185,7 +185,7 @@ def unsubscribe_user(access_token: str, user: str, group:str) -> str:
 
 
 @api.post(path="/create_alias")
-def create_alias(access_token: str, alias: str, group: str):
+def create_alias(access_token: str, alias: str, group: str) -> str:
     username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     if not is_mod(username):
@@ -207,6 +207,65 @@ def create_alias(access_token: str, alias: str, group: str):
             }
             db.execute(f.read(), arg)
     return "success"
+
+
+@api.post(path="/delete_alias")
+def delete_alias(access_token: str, alias: str) -> str:
+    username = get_user(access_token)
+    alias = alias.upper()
+    if not pinglib.group_name_is_valid(alias):
+        raise HTTPException(status_code=400, detail="Invalid alias")
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    if not is_mod(username):
+        raise HTTPException(status_code=403, detail="You must be a mod to create an alias")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
+    with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
+        with open("sql/functions/delete_alias.sql") as f:
+            arg = {
+                "group_alias": alias,
+            }
+            db.execute(f.read(), arg)
+    return "success"
+
+
+@api.get(path="/de_alias_group")
+def de_alias_group(alias: str) -> str:
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    if not group_is_valid_and_exists(alias):
+        raise HTTPException(status_code=400, detail="Invalid group")
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
+    cur = db.cursor()
+    with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
+        with open("sql/functions/de-alias.sql") as f:
+            de_alias = {
+                item[0]: item[1]
+                for item
+                in db.execute(f.read()).fetchall()
+            }
+            group = de_alias[alias]
+    db.close()
+    return group
+
+
+@api.get(path="/get_group_aliases")
+def get_group_aliases(alias: str) -> List[str]:
+    group = de_alias_group(alias)
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
+    cur = db.cursor()
+    with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
+        with open("sql/functions/get_group_aliases.sql") as f:
+            arg = {"group_name": group}
+            aliases = cur.execute(f.read(), arg).fetchall()
+    db.close()
+    return aliases
+
 
 
 @api.get(path="/get_ping_log")
@@ -236,6 +295,8 @@ def get_group_subscribers(access_token:str, group):
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
     cur = db.cursor()
     with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
         with open("sql/functions/de-alias.sql") as f:
             de_alias = {
                 item[0]: item[1]
@@ -243,13 +304,10 @@ def get_group_subscribers(access_token:str, group):
                 in db.execute(f.read()).fetchall()
             }
             group = de_alias[group]
-        with open("sql/functions/init_db.sql") as f:
-            db.executescript(f.read())
         with open("sql/functions/get_group_subscribers.sql") as f:
             arg = {"group_name": group}
             subscribers = cur.execute(f.read(), arg).fetchall()
     db.close()
-    print(subscribers)
     return subscribers
 
 

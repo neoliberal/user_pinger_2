@@ -107,6 +107,7 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
             <div>
                 <p>Select a group to moderate <input id="group-to-mod"><button onclick="moderate_group()">Go</button></p>
                 <p>No need to delete groups, just set locked, protected, and hidden</p>
+                <!--
                 <ul>
                     <li>&#x270B; Protected: only mods can subscribe</li>
                     <li>&#x1F512; Locked: only mods can ping</li>
@@ -117,7 +118,6 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
                     <li>Change protected, locked, hidden</li>
                     <li>Create group alias</li>
                 </ul>
-                <!--
                 <p>
                     Create <input id ="create_alias_name" onchange="validate_alias(this)" value="ALIAS" autocomplete="off">
                     pointing to <input id="create_alias_group" onchange="validate_group(this)" value="GROUP" autocomplete="off">
@@ -125,7 +125,10 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
                 </p>
                 -->
             </div>
-            <div id="subscribers"></div>
+            <div id="group-name"></div>
+            <div id="group-settings"></div>
+            <div id="group-aliases"></div>
+            <div id="group-subscribers"></div>
         </div>
         <div class="user-tab" style="display: none;">
             <div>

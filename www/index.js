@@ -34,12 +34,12 @@ if (!access_token) {
 
 // Apparently this is halal now, provided you defer the script
 // No more window.onload
+document.getElementById("toggle-mod-mode").checked = false;
+document.getElementById("all-mode-button").checked = true;
 load_page();
 
 
 function load_page() {
-    document.getElementById("toggle-mod-mode").checked = false;
-    document.getElementById("all-mode-button").checked = true;
     fetch(
         `api/me?access_token=${access_token}`
     ).then((response) => {
@@ -71,7 +71,7 @@ function load_page() {
 function impersonate() {
     document.getElementById("groups").innerHTML = "";
     target_user = document.getElementById("target-user").value;
-    document.getElementById("target-user-name").innerHTML = `Viewing /u/${target_user}:`
+    document.getElementById("target-user-name").innerHTML = `/u/${target_user}:`
     list_user_groups(target_user);
 }
 
@@ -98,24 +98,202 @@ function list_user_groups(target) {
 
 function moderate_group() {
     group = document.getElementById("group-to-mod").value;
+    build_group_header(group);
     list_group_subscribers(group);
+    list_group_aliases(group);
+    build_settings_table(group);
 }
 
+
+function build_group_header(group) {
+    fetch(`api/de_alias_group?alias=${group}`, {method: "GET"})
+        .then((response) => {
+            if (response.status == 200) {
+                return response.json();
+            }
+        }).then((de_aliased) => {
+            const group_name = document.getElementById("group-name");
+            group_name.innerHTML = `<h1>${de_aliased}</h1>`;
+        });
+}
+
+
+function list_group_aliases(group) {
+    fetch(`api/get_group_aliases?alias=${group}`, {method: "GET"})
+        .then((response) => {
+            if (response.status == 200) {
+                return response.json();
+            }
+        }).then((aliases) => {
+            build_alias_table(group, aliases);
+        });
+}
 
 function list_group_subscribers(group) {
     fetch(`api/get_group_subscribers?access_token=${access_token}&group=${group}`, {method: "GET"})
         .then((response) => {
-                if (response.status == 200) {
-                    console.log("success")
-                    return response.json()
-                }
-        }).then ((data) => {
-            build_subscriber_table(data);
+            if (response.status == 200) {
+                return response.json();
+            } else {
+                alert("There was an error getting subscribers, contact support.")
+            }
+        }).then ((subscribers) => {
+            if (subscribers) {
+                build_subscriber_table(group, subscribers);
+            }
         })
 }
 
-function build_subscriber_table(subscribers) {
-    console.log(subscribers)
+
+function build_alias_table(group, aliases) {
+    document.getElementById("group-aliases").innerHTML = "";
+    const aliases_header = document.createElement("h2");
+    const aliases_text = document.createTextNode("Aliases");
+    aliases_header.append(aliases_text);
+    document.getElementById("group-aliases").appendChild(aliases_header)
+
+    const create_alias_div = document.createElement("div");
+    const create_alias_input = document.createElement("input");
+    create_alias_input.id = "create_alias_group";
+    create_alias_div.append(create_alias_input);
+    const create_alias_button = document.createElement("button");
+    create_alias_button.append(document.createTextNode("Create alias"));
+    create_alias_button.group = group;
+    create_alias_button.addEventListener("click", create_alias)
+    create_alias_div.append(create_alias_button);
+    document.getElementById("group-aliases").appendChild(create_alias_div);
+
+    const alias_table = document.createElement("table");
+    for (var i = 0; i < aliases.length; i++) {
+        const alias_row = document.createElement("tr");
+        const alias_cell = alias_row.insertCell();
+        alias_cell.appendChild(document.createTextNode(aliases[i][0]));
+        const delete_alias_cell = alias_row.insertCell()
+        delete_alias_button = document.createElement("button");
+        delete_alias_button.appendChild(document.createTextNode("delete"));
+        delete_alias_button.group = group;
+        delete_alias_button.alias = aliases[i][0];
+        delete_alias_button.addEventListener("click", delete_alias)
+        delete_alias_cell.appendChild(delete_alias_button);
+        alias_table.appendChild(alias_row);
+    }
+    document.getElementById("group-aliases").appendChild(alias_table);
+}
+
+
+function build_settings_table(group, parameters) {
+    document.getElementById("group-settings").innerHTML = "";
+    const settings_header = document.createElement("h2");
+    const settings_text = document.createTextNode("Settings");
+    settings_header.append(settings_text);
+    document.getElementById("group-settings").appendChild(settings_header)
+
+    fetch(`api/de_alias_group?alias=${group}`, {method: "GET"})
+        .then((response) => {
+            if (response.status == 200) {
+                return response.json();
+            }
+        }).then((de_aliased) => {
+            let group_protected;
+            let group_locked;
+            let group_hidden;
+            for (var cat_idx = 0; cat_idx < groups.length; cat_idx++) {
+                let category = groups[cat_idx]["subcategories"];
+                for (var subcat_idx = 0; subcat_idx < category.length; subcat_idx++) {
+                    let subcategory = category[subcat_idx]["groups"];
+                    for (var group_idx = 0; group_idx < subcategory.length; group_idx++) {
+                        group = subcategory[group_idx];
+                        if (group[1] == de_aliased) {
+                            group_protected = group[3];
+                            group_locked = group[6];
+                            group_hidden = group[5];
+                        }
+                    }
+                }
+            }
+            settings_table = document.createElement("table");
+
+            protected_row = document.createElement("tr");
+            protected_checkbox_cell = protected_row.insertCell();
+            protected_checkbox = document.createElement("input");
+            protected_checkbox.type = "checkbox";
+            protected_checkbox.group = de_aliased;
+            protected_checkbox.addEventListener("click", edit_group_protected);
+            if (group_protected) {
+                protected_checkbox.checked = true;
+            }
+            protected_checkbox_cell.appendChild(protected_checkbox);
+            protected_description_cell = protected_row.insertCell();
+            protected_description = document.createTextNode("protected: only mods can subscribe");
+            protected_description_cell.appendChild(protected_description);
+            settings_table.appendChild(protected_row);
+
+            locked_row = document.createElement("tr");
+            locked_checkbox_cell = locked_row.insertCell();
+            locked_checkbox = document.createElement("input");
+            locked_checkbox.type = "checkbox";
+            locked_checkbox.group = de_aliased;
+            locked_checkbox.addEventListener("click", edit_group_locked);
+            if (group_locked) {
+                locked_checkbox.checked = true;
+            }
+            locked_checkbox_cell.appendChild(locked_checkbox);
+            locked_description_cell = locked_row.insertCell();
+            locked_description = document.createTextNode("locked: only mods can ping");
+            locked_description_cell.appendChild(locked_description);
+            settings_table.appendChild(locked_row);
+
+            hidden_row = document.createElement("tr");
+            hidden_checkbox_cell = hidden_row.insertCell();
+            hidden_checkbox = document.createElement("input");
+            hidden_checkbox.type = "checkbox";
+            hidden_checkbox.group = de_aliased;
+            hidden_checkbox.addEventListener("click", edit_group_hidden);
+            if (group_hidden) {
+                hidden_checkbox.checked = true;
+            }
+            hidden_checkbox_cell.appendChild(hidden_checkbox);
+            hidden_description_cell = hidden_row.insertCell();
+            hidden_description = document.createTextNode("hidden: doesn't appear in documentation (except to mods)");
+            hidden_description_cell.appendChild(hidden_description);
+            settings_table.appendChild(hidden_row);
+
+            document.getElementById("group-settings").appendChild(settings_table);
+        });
+}
+
+
+function build_subscriber_table(group, subscribers) {
+    document.getElementById("group-subscribers").innerHTML = "";
+    const group_header = document.createElement("h2");
+    const group_header_text = document.createTextNode("Subscribers");
+    group_header.appendChild(group_header_text);
+    document.getElementById("group-subscribers").appendChild(group_header);
+
+    const subscriber_table = document.createElement("table");
+    subscriber_table.id = "subscriber-table";
+    for (var i = 0; i < subscribers.length; i++) {
+        const subscriber_row = document.createElement("tr");
+        const user_cell = subscriber_row.insertCell();
+        const user_text = document.createTextNode(subscribers[i]);
+        user_cell.appendChild(user_text);
+        const unsubscribe_cell = subscriber_row.insertCell();
+        const unsubscribe_button = document.createElement("button");
+        unsubscribe_button.appendChild(document.createTextNode("unsubscribe"));
+        unsubscribe_button.user = subscribers[i][0];
+        unsubscribe_button.group = group;
+        unsubscribe_button.addEventListener("click", unsubscribe_user_from_group);
+        unsubscribe_cell.appendChild(unsubscribe_button);
+        const mod_cell = subscriber_row.insertCell();
+        const mod_button = document.createElement("button");
+        mod_button.appendChild(document.createTextNode("mod"));
+        mod_button.user = subscribers[i][0];
+        mod_button.addEventListener("click", toggle_user_tab);
+        mod_cell.appendChild(mod_button);
+        subscriber_table.appendChild(subscriber_row);
+    }
+
+    document.getElementById("group-subscribers").appendChild(subscriber_table);
 }
 
 // TAB BAR FUNCTIONS
@@ -161,9 +339,8 @@ function toggle_all_tab() {
 }
 
 
-function toggle_group_tab(group=null) {
+function toggle_group_tab(evt) {
     document.getElementById("group-mode-button").checked = true;
-    target_user = "";
     let all_tab_els = document.getElementsByClassName("all-tab");
     let group_tab_els = document.getElementsByClassName("group-tab");
     let user_tab_els = document.getElementsByClassName("user-tab");
@@ -176,10 +353,18 @@ function toggle_group_tab(group=null) {
     for (var i = 0; i < group_tab_els.length; i++) {
         group_tab_els[i].style.display = "";
     }
+    if (evt) {
+        const group = evt.target.group;
+        document.getElementById("group-to-mod").value = group;
+        build_group_header(group);
+        list_group_subscribers(group);
+        list_group_aliases(group);
+        build_settings_table(group)
+    }
 }
 
 
-function toggle_user_tab(user=null) {
+function toggle_user_tab(evt) {
     document.getElementById("user-mode-button").checked = true;
     let all_tab_els = document.getElementsByClassName("all-tab");
     let group_tab_els = document.getElementsByClassName("group-tab");
@@ -194,9 +379,10 @@ function toggle_user_tab(user=null) {
         user_tab_els[i].style.display = "";
     }
     document.getElementById("groups").innerHTML = "";
-    if (user) {
+    if (evt) {
+        const user = evt.target.user;
         document.getElementById("target-user").value = user;
-        document.getElementById("target-user-name").innerHTML = `Viewing /u/${user}:`
+        document.getElementById("target-user-name").innerHTML = `/u/${user}:`
         list_user_groups(user);
     }
 }
@@ -265,11 +451,17 @@ function unsubscribe(group) {
 }
 
 
-function subscribe_user(user, group) {
-}
-
-
-function unsubscribe_user(user, group) {
+function unsubscribe_user_from_group(evt) {
+    user = evt.target.user;
+    group = evt.target.group;
+    fetch(`api/unsubscribe_user?access_token=${access_token}&user=${user}&group=${group}`, {method: "POST"})
+        .then((response) => {
+            if (response.status == 200) {
+                list_group_subscribers(group);
+            } else {
+                alert("There was an error subscribing. Please contact support.");
+            }
+        });
 }
 
 
@@ -293,19 +485,33 @@ function subscribe_user_to_group() {
 }
 
 
-function create_alias() {
-    let alias = document.getElementById("create_alias_name").value;
-    let group = document.getElementById("create_alias_group").value;
+function create_alias(evt) {
+    let alias = document.getElementById("create_alias_group").value;
+    let group = evt.target.group;
     fetch(
         `api/create_alias?access_token=${access_token}&alias=${alias}&group=${group}`,
         {method: "POST"}
     ).then((response) => {
         if (response.status == "200") {
-            alert("Alias created.");
+            list_group_aliases(group);
         } else {
-            alert("There was an error creating the alias. Please try again.");
+            alert("There was an error creating the alias. Contact support.");
         }
     });
+}
+
+
+function delete_alias(evt) {
+    let alias = evt.target.alias;
+    let group = evt.target.group;
+    fetch(`api/delete_alias?access_token=${access_token}&alias=${alias}`, {method: "POST"})
+        .then((response) => {
+            if (response.status == "200") {
+                list_group_aliases(group, alias);
+            } else {
+                alert("There was an error deleting the alias. Contact support.")
+            }
+        });
 }
 
 
@@ -355,6 +561,12 @@ function validate_username(e) {
 function discard_changes() {
     groups = JSON.parse(JSON.stringify(old_groups));
     build_group_table(groups, old_groups);
+    moderate_group()
+    //group_modding_name = document.getElementById("group-name").children[0].innerText;
+    //console.log(group_modding_name)
+    //if (group_modding_name) {
+    //
+    //}
 }
 
 
@@ -369,6 +581,8 @@ function update_groups() {
         if (response.status != "200") {
             alert("There was an error updating the groups. Please contact support.");
         } else {
+            //build_group_table(groups, old_groups);
+            moderate_group();
             load_page();
         }
     });
@@ -776,12 +990,16 @@ function edit_group_description(e) {
 }
 
 function edit_group_protected (e) {
-    let group_id = e.target.group_id;
+    const group_name = e.target.group;
+    const checked = e.target.checked
     for (var cat_idx = 0; cat_idx < groups.length; cat_idx++) {
-        for (var subcat_idx = 0; subcat_idx < groups[cat_idx]["subcategories"].length; subcat_idx++) {
-            for (var group_idx = 0; group_idx < groups[cat_idx]["subcategories"][subcat_idx]["groups"].length; group_idx++) {
-                if (groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][7] == group_id) {
-                    groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][3] = e.target.checked ? 1 : 0;
+        const category = groups[cat_idx]["subcategories"];
+        for (var subcat_idx = 0; subcat_idx < category.length; subcat_idx++) {
+            const subcategory = category[subcat_idx]["groups"];
+            for (var group_idx = 0; group_idx < subcategory.length; group_idx++) {
+                group = subcategory[group_idx];
+                if (group[1] == group_name) {
+                    groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][3] = checked ? 1 : 0;
                 }
             }
         }
@@ -790,12 +1008,16 @@ function edit_group_protected (e) {
 }
 
 function edit_group_locked (e) {
-    let group_id = e.target.group_id;
+    const group_name = e.target.group;
+    const checked = e.target.checked
     for (var cat_idx = 0; cat_idx < groups.length; cat_idx++) {
-        for (var subcat_idx = 0; subcat_idx < groups[cat_idx]["subcategories"].length; subcat_idx++) {
-            for (var group_idx = 0; group_idx < groups[cat_idx]["subcategories"][subcat_idx]["groups"].length; group_idx++) {
-                if (groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][7] == group_id) {
-                    groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][6] = e.target.checked ? 1 : 0;
+        const category = groups[cat_idx]["subcategories"];
+        for (var subcat_idx = 0; subcat_idx < category.length; subcat_idx++) {
+            const subcategory = category[subcat_idx]["groups"];
+            for (var group_idx = 0; group_idx < subcategory.length; group_idx++) {
+                group = subcategory[group_idx];
+                if (group[1] == group_name) {
+                    groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][6] = checked ? 1 : 0;
                 }
             }
         }
@@ -804,12 +1026,16 @@ function edit_group_locked (e) {
 }
 
 function edit_group_hidden (e) {
-    let group_id = e.target.group_id;
+    const group_name = e.target.group;
+    const checked = e.target.checked
     for (var cat_idx = 0; cat_idx < groups.length; cat_idx++) {
-        for (var subcat_idx = 0; subcat_idx < groups[cat_idx]["subcategories"].length; subcat_idx++) {
-            for (var group_idx = 0; group_idx < groups[cat_idx]["subcategories"][subcat_idx]["groups"].length; group_idx++) {
-                if (groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][7] == group_id) {
-                    groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][5] = e.target.checked ? 1 : 0;
+        const category = groups[cat_idx]["subcategories"];
+        for (var subcat_idx = 0; subcat_idx < category.length; subcat_idx++) {
+            const subcategory = category[subcat_idx]["groups"];
+            for (var group_idx = 0; group_idx < subcategory.length; group_idx++) {
+                group = subcategory[group_idx];
+                if (group[1] == group_name) {
+                    groups[cat_idx]["subcategories"][subcat_idx]["groups"][group_idx][5] = checked ? 1 : 0;
                 }
             }
         }
@@ -948,7 +1174,7 @@ function build_group_table(groups, old_groups) {
             // Create table header if not exists
             let columns;
             if (mod_mode) {
-                columns = ["", "", "Name", "Description", "\u{270B}", "\u{1F512}", "\u{1F648}"];
+                columns = ["", "", "Name", "Description", ""];
             } else {
                 columns = ["", "Name", "Description", "\u{1F4E9}"];
             }
@@ -1017,21 +1243,10 @@ function build_group_table(groups, old_groups) {
                 let group_move_down = document.createElement("button");
                 group_move_down.addEventListener("click", function() {move_group_down(group[7]);});
                 group_move_down.appendChild(document.createTextNode("\u{2B07}"));
-                let group_protected_element = document.createElement("input");
-                group_protected_element.type = "checkbox";
-                group_protected_element.checked = group_protected;
-                group_protected_element.group_id = group[7];
-                group_protected_element.addEventListener("click", edit_group_protected);
-                let group_hidden_element = document.createElement("input");
-                group_hidden_element.type = "checkbox";
-                group_hidden_element.checked = group_hidden;
-                group_hidden_element.group_id = group[7];
-                group_hidden_element.addEventListener("click", edit_group_hidden);
-                let group_locked_element = document.createElement("input");
-                group_locked_element.type = "checkbox";
-                group_locked_element.checked = group_locked;
-                group_locked_element.group_id = group[7];
-                group_locked_element.addEventListener("click", edit_group_locked);
+                let mod_button = document.createElement("button");
+                mod_button.appendChild(document.createTextNode("\u{2699}\u{FE0F}"));
+                mod_button.group = group[1];
+                mod_button.addEventListener("click", toggle_group_tab);
 
                 let cells;
                 if (mod_mode) {
@@ -1040,9 +1255,7 @@ function build_group_table(groups, old_groups) {
                         group_move_down,
                         group_name,
                         group_description,
-                        group_protected_element,
-                        group_locked_element,
-                        group_hidden_element,
+                        mod_button,
                     ];
                 } else {
                     cells = [
