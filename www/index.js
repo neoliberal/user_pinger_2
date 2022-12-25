@@ -98,10 +98,12 @@ function list_user_groups(target) {
 
 function moderate_group() {
     group = document.getElementById("group-to-mod").value;
-    build_group_header(group);
-    list_group_subscribers(group);
-    list_group_aliases(group);
-    build_settings_table(group);
+    if (group) {
+        build_group_header(group);
+        list_group_subscribers(group);
+        list_group_aliases(group);
+        build_settings_table(group);
+    }
 }
 
 
@@ -323,6 +325,7 @@ function toggle_mod_mode(checkbox) {
 
 function toggle_all_tab() {
     document.getElementById("all-mode-button").checked = true;
+    document.getElementById("group-to-mod").value = "";
     target_user = "";
     let all_tab_els = document.getElementsByClassName("all-tab");
     let group_tab_els = document.getElementsByClassName("group-tab");
@@ -371,6 +374,7 @@ function toggle_group_tab(evt) {
 
 function toggle_user_tab(evt) {
     document.getElementById("user-mode-button").checked = true;
+    document.getElementById("group-to-mod").value = "";
     let all_tab_els = document.getElementsByClassName("all-tab");
     let group_tab_els = document.getElementsByClassName("group-tab");
     let user_tab_els = document.getElementsByClassName("user-tab");
@@ -522,13 +526,10 @@ function delete_alias(evt) {
 
 function validate_group_to_mod(e) {
     let group = e.value;
-    console.log(group)
     if (!group.match(/^[A-Z0-9-]+$/)) {
-        console.log("bad name");
         e.parentElement.classList.add("bad-input");
         return;
     }
-    console.log("good name");
     e.parentElement.classList.remove("bad-input");
     document.getElementById("group-to-mod-button").classList.remove("bad-input");
 }
@@ -1245,6 +1246,13 @@ function build_group_table(groups, old_groups) {
                     group_name.value = group[1];
                     group_name.group_id = group[7];
                     group_name.group_name = group[1];
+                    if (!group_name.group_name) {
+                        group_name.classList.add("bad-input");
+                        let save_prompt = document.getElementById("save-prompt");
+                        let discard_prompt = document.getElementById("discard-prompt");
+                        save_prompt.style.display = "none";
+                        discard_prompt.style.display = "none";
+                    }
                     group_name.onchange = edit_group_name;
                     group_description = document.createElement("Input");
                     group_description.value = group[2]
