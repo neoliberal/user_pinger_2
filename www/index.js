@@ -40,6 +40,7 @@ load_page();
 
 
 function load_page() {
+    document.getElementById("toggle-mod-mode").parentElement.classList.add("bad-input")
     fetch(
         `api/me?access_token=${access_token}`
     ).then((response) => {
@@ -63,6 +64,7 @@ function load_page() {
                 groups = data;
                 old_groups = JSON.parse(JSON.stringify(groups));
                 build_group_table(groups, old_groups);
+                document.getElementById("toggle-mod-mode").parentElement.classList.remove("bad-input")
             });
     });
 }

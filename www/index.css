@@ -182,6 +182,15 @@ td input, td button {
     color: #BBB;
 }
 
+.bad-input label, label.bad-input {
+    pointer-events: none;
+    color: #BBB;
+}
+
+.bad-input input[type="checkbox"], input[type="checkbox"].bad-input {
+    pointer-events: none;
+}
+
 #save-prompt.loading span {
     visibility: hidden;
 }
