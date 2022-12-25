@@ -136,6 +136,9 @@ function list_group_subscribers(group) {
         .then((response) => {
             if (response.status == 200) {
                 return response.json();
+            } else if (response.status == 404) {
+                alert("No such group found. Please try again.")
+                return;
             } else {
                 alert("There was an error getting subscribers, contact support.")
             }

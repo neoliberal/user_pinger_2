@@ -293,8 +293,10 @@ def get_group_subscribers(access_token:str, group):
     username = get_user(access_token)
     if not is_mod(username):
         raise HTTPException(status_code=403, detail="You must be a mod to get group subscribers")
-    if not group_is_valid_and_exists(group):
+    if not pinglib.group_name_is_valid(group):
         raise HTTPException(status_code=400, detail="Invalid group")
+    if not group_is_valid_and_exists(group):
+        raise HTTPException(status_code=404, detail="Group not found")
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
     cur = db.cursor()
     with db:
