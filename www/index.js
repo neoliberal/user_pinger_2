@@ -551,9 +551,9 @@ function validate_alias(e) {
 function validate_username(e) {
     let username = e.value;
     if (!username.match(/^[a-zA-Z0-9_-]{1,20}$/)) {
-        e.classList.add("bad-input");
+        e.parentElement.classList.add("bad-input");
     } else {
-        e.classList.remove("bad-input");
+        e.parentElement.classList.remove("bad-input");
     }
 }
 
