@@ -361,6 +361,8 @@ function toggle_group_tab(evt) {
         list_group_subscribers(group);
         list_group_aliases(group);
         build_settings_table(group)
+    } else {
+        document.getElementById("group-to-mod-button").classList.add("bad-input");
     }
 }
 
@@ -513,6 +515,20 @@ function delete_alias(evt) {
                 alert("There was an error deleting the alias. Contact support.")
             }
         });
+}
+
+
+function validate_group_to_mod(e) {
+    let group = e.value;
+    console.log(group)
+    if (!group.match(/^[A-Z0-9-]+$/)) {
+        console.log("bad name");
+        e.parentElement.classList.add("bad-input");
+        return;
+    }
+    console.log("good name");
+    e.parentElement.classList.remove("bad-input");
+    document.getElementById("group-to-mod-button").classList.remove("bad-input");
 }
 
 
