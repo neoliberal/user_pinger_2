@@ -360,17 +360,17 @@ function toggle_group_tab(evt) {
     for (var i = 0; i < group_tab_els.length; i++) {
         group_tab_els[i].style.display = "";
     }
-    if (evt.target.group) {
+    if (!evt || !evt.target.group) {
+        document.getElementById("group-to-mod-button").classList.add("bad-input");
+        document.getElementById("group-to-mod").value = "";
+    } else {
         const group = evt.target.group;
         document.getElementById("group-to-mod").value = group;
         document.getElementById("group-to-mod-button").classList.remove("bad-input");
         build_group_header(group);
         list_group_subscribers(group);
         list_group_aliases(group);
-        build_settings_table(group)
-    } else {
-        document.getElementById("group-to-mod-button").classList.add("bad-input");
-        document.getElementById("group-to-mod").value = "";
+        build_settings_table(group);
     }
 }
 
@@ -396,6 +396,9 @@ function toggle_user_tab(evt) {
         document.getElementById("target-user").value = user;
         document.getElementById("target-user-name").innerHTML = `/u/${user}:`
         list_user_groups(user);
+    } else {
+        document.getElementById("target-user-button").classList.add("bad-input");
+        document.getElementById("target-user").value = "";
     }
 }
 
@@ -578,6 +581,7 @@ function validate_username(e) {
         e.parentElement.classList.add("bad-input");
     } else {
         e.parentElement.classList.remove("bad-input");
+        document.getElementById("target-user-button").classList.remove("bad-input");
     }
 }
 
