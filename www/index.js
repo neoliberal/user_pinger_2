@@ -357,12 +357,14 @@ function toggle_group_tab(evt) {
     if (evt) {
         const group = evt.target.group;
         document.getElementById("group-to-mod").value = group;
+        document.getElementById("group-to-mod-button").classList.remove("bad-input");
         build_group_header(group);
         list_group_subscribers(group);
         list_group_aliases(group);
         build_settings_table(group)
     } else {
         document.getElementById("group-to-mod-button").classList.add("bad-input");
+        document.getElementById("group-to-mod").value = "";
     }
 }
 
