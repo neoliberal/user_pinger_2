@@ -72,6 +72,8 @@ def alias_exists(alias: str) -> bool:
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
         with open("sql/functions/alias_exists.sql") as f:
             exists = bool(db.execute(f.read(), {"alias_name": alias}).fetchall()[0][0])
     if exists:
@@ -196,8 +198,10 @@ def create_alias(access_token: str, alias: str, group: str) -> str:
         raise HTTPException(status_code=400, detail="Invalid alias")
     if not group_is_valid_and_exists(group):
         raise HTTPException(status_code=400, detail="Invalid group")
+    if group_is_valid_and_exists(alias):
+        raise HTTPException(status_code=409, detail="Alias already in use as group name")
     if alias_exists(alias):
-        raise HTTPException(status_code=400, detail="Cannot create an alias that already exists")
+        raise HTTPException(status_code=409, detail="Alias already in use for another group")
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
     with db:
         with open("sql/functions/init_db.sql") as f:

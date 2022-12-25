@@ -360,7 +360,7 @@ function toggle_group_tab(evt) {
     for (var i = 0; i < group_tab_els.length; i++) {
         group_tab_els[i].style.display = "";
     }
-    if (evt) {
+    if (evt.target.group) {
         const group = evt.target.group;
         document.getElementById("group-to-mod").value = group;
         document.getElementById("group-to-mod-button").classList.remove("bad-input");
@@ -506,6 +506,8 @@ function create_alias(evt) {
     ).then((response) => {
         if (response.status == "200") {
             list_group_aliases(group);
+        } else if (response.status == "409") {
+            alert("This alias is already in use for another group, please try another.");
         } else {
             alert("There was an error creating the alias. Contact support.");
         }
@@ -529,7 +531,7 @@ function delete_alias(evt) {
 
 function validate_group_to_mod(e) {
     let group = e.value;
-    if (!group.match(/^[A-Z0-9-]+$/)) {
+    if (!group.match(/^[a-zA-Z0-9-]+$/)) {
         e.parentElement.classList.add("bad-input");
         return;
     }
