@@ -452,6 +452,10 @@ def update_groups(config: UpdateGroups):
                     raise HTTPException(
                         status_code=400, detail="Invalid group name"
                     )
+                if alias_exists(name):
+                    raise HTTPException(
+                        status_code=409, detail="Group name conflicts with existing alias"
+                    )
                 description = group[2]
                 category = ":".join(filter(None, [category_name, subcategory_name]))
                 protected = group[3]

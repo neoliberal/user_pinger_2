@@ -603,12 +603,15 @@ function update_groups() {
         "api/update_groups",
         {method: "POST", headers: {"Content-Type": "application/json"}, body: body}
     ).then((response) => {
-        if (response.status != "200") {
-            alert("There was an error updating the groups. Please contact support.");
-        } else {
-            //build_group_table(groups, old_groups);
+        if (response.status == "200") {
             moderate_group();
             load_page();
+        } else if (response.status == "409") {
+            alert("Group name conflicts with existing alias.")
+            discard_changes();
+        } else {
+            alert("There was an error updating the groups. Please contact support.");
+            discard_changes();
         }
     });
 }
