@@ -82,7 +82,9 @@ function list_user_groups(target) {
     fetch(
         `api/list_user_groups?access_token=${access_token}&target_user=${target}`
     ).then((response) => {
-        if (response.status != "200") {
+        if (response.status == "403") {
+            alert("You must be a mod to see a user's subscriptions")
+        } else if (response.status != "200") {
             alert("Unknown error fetching groups. Please contact support")
         }
         return response.json();
@@ -140,6 +142,9 @@ function list_group_subscribers(group) {
                 return response.json();
             } else if (response.status == 404) {
                 alert("No such group found. Please try again.")
+                return;
+            } else if (response.status == 403) {
+                alert("You must be a mod to edit a group.")
                 return;
             } else {
                 alert("There was an error getting subscribers, contact support.")
@@ -590,6 +595,7 @@ function validate_username(e) {
 
 // banner & footer buttons
 function discard_changes() {
+    document.getElementById("save-prompt").classList.remove("loading");
     groups = JSON.parse(JSON.stringify(old_groups));
     build_group_table(groups, old_groups);
     moderate_group()
@@ -614,6 +620,9 @@ function update_groups() {
             load_page();
         } else if (response.status == "409") {
             alert("Group name conflicts with existing alias.")
+            discard_changes();
+        } else if (response.status == "403") {
+            alert("You must be a mod to edit the groups.")
             discard_changes();
         } else {
             alert("There was an error updating the groups. Please contact support.");
