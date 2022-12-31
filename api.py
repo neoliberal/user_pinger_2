@@ -88,7 +88,7 @@ def is_mod(username):
         refresh_token=os.environ["REFRESH_TOKEN"],
         user_agent="linux:user_pinger_2-api:v0.0.1 (by /u/jenbanim)"
     )
-    subreddit = os.environ["SUBREDDIT"]
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
     return username in reddit.subreddit(subreddit).moderator()
 
 

@@ -433,7 +433,7 @@ class UserPinger:
                     "%s group %s does not exist", message.id, group
                 )
                 self.parsed.append(message.id)
-                self.ping_error_reply(message, f"{group} does not exist")
+                self.message_error_reply(message, f"{group} does not exist")
                 return
         self.logger.debug("%s Group(s) exist", message.id)
 
