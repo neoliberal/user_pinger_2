@@ -2,5 +2,5 @@ env/
 __pycache__/
 api.sock
 sql/db/
-variables.env
+variables.env*
 *.swp
