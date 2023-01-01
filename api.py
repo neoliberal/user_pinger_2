@@ -344,13 +344,13 @@ def list_user_groups(access_token:str, target_user:str) -> List[Category]:
         raise HTTPException(status_code=403, detail="You must be a mod to view a user's subsriptions")
     if not re.match("^[a-zA-Z0-9_-]{1,20}$", target_user):
         raise HTTPException(status_code=400, detail="Invalid target user")
-    return get_groups(username, target_user)
+    return get_groups(username, target_user.lower())
 
 
 @api.get(path="/list_groups")
 def list_groups(access_token:str) -> List[Category]:
     """List the groups for display on the website"""
-    username = get_user(access_token)
+    username = get_user(access_token).lower()
     return get_groups(username, username)
 
 
