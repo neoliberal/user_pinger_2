@@ -1,4 +1,4 @@
-### [Click here to view the comment](${comment_url})
+### [Click here to view the comment](${comment_url}?context=69)
 
 [Click here to unsubscribe from ${group}](https://reddit.com/message/compose?to=${bot_username}&subject=Unsubscribe%20from%20group%20${group}&message=unsubscribe%20${group})
 
