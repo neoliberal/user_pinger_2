@@ -1,12 +1,10 @@
 ^^^^^^^^^^^^^^^^^MODERATORS_Do_not_edit_this_page___It_is_automatically_generated___your_changes_will_be_overwritten
 
-**Users with new accounts may not be able to PM /u/${bot_username} due to Reddit's spam prevention features. Please [message the mods](https://www.reddit.com/message/compose/?to=/r/${primary_subreddit}) if you have this problem**
-
 # About
 
 Pings are a way of sending messages to a group of people within /r/${subreddit}. When someone writes `!ping GROUP` in a comment, everyone subscribed to GROUP will get a message from /u/${bot_username} containing a link to that comment.
 
-To ping a group, you must first be subscribed to that group.
+To ping a group, you must first subscribe to that group.
 
 ## Managing Subscriptions
 
@@ -21,11 +19,13 @@ Unsubscribe from GROUP | unsubscribe GROUP
 [List my subscriptions](https://reddit.com/message/compose?to=${bot_username}&subject=List%20my%20subscriptions&message=list_my_subscriptions) | unsubscribe
 [Unsubscribe from all groups](https://reddit.com/message/compose?to=${bot_username}&subject=Unsubscribe%20from%20all%20groups&message=unsubscribe) | unsubscribe
 
+If you have a new account that is unable to send DMs you can also [manage your subscriptions on neoliber.al](https://neoliber.al/user_pinger_2/)
+
 ## Rules / Etiquette
 
 If you see a ping you think breaks the rules, please report it and [message the moderators](https://www.reddit.com/message/compose?to=%2Fr%2F${primary_subreddit}). Users who repeatedly break these rules may be banned from a ping or the subreddit as a whole
 
-* **Don't Spam:** Listen to the group and try to only send pings others want to receive.
+* **Don't Spam:** Listen to the group and try to only send pings others want to receive
 * **Don't Brigade:** Avoid posting links to subreddits that are likely to cause drama. Absolutely do not encourage participation in any linked threads
 * **Don't Harass:** Avoid using pings for "dunks" that target particular users, regardless of intent
 * **Don't Delete Pings:** Getting a link to a bad ping is still less obnoxious than getting a link to a deleted comment
@@ -36,7 +36,7 @@ If you see a ping you think breaks the rules, please report it and [message the 
 * Mods may occasionally ping groups for administrative reasons, like strawpolls for new group proposals, and announcing spinoff groups
 * /u/${bot_username} does not pay attention to posts that are edited. If you mess up a ping, you'll have to post another comment
 * If you would like a ping group to be created, make a post in /r/metaNL
-* This bot is [open source](https://github.com/neoliberal/user_pinger/) and development is ongoing. See our [issues page](https://github.com/neoliberal/user_pinger/issues) for upcoming features and bug fixes
+* This bot is [open source](https://github.com/neoliberal/user_pinger_2/) and development is ongoing. See our [issues page](https://github.com/neoliberal/user_pinger_2/issues) for upcoming features and bug fixes
 
 # Ping Groups
 
