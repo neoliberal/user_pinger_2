@@ -22,6 +22,12 @@ def update(reddit, subreddit, after_epoch):
         cur.execute(f.read(), {"after_epoch": after_epoch})
     with open("sql/functions/get_documentation.sql") as f:
         data = cur.execute(f.read()).fetchall()
+    with open("sql/functions/count_groups.sql") as f:
+        num_groups = cur.execute(f.read()).fetchall()[0][0]
+    with open("sql/functions/count_subscriptions.sql") as f:
+        num_subscriptions = cur.execute(f.read()).fetchall()[0][0]
+    with open("sql/functions/count_users.sql") as f:
+        num_users = cur.execute(f.read()).fetchall()[0][0]
     cur.close()
     db.close()
 
@@ -36,7 +42,10 @@ def update(reddit, subreddit, after_epoch):
         for category
         in groupby(sorted(data, key = lambda x: x[2]), lambda x: x[2][0])
     ]
+
+    # Create the ping documentation text
     lines = []
+    lines.append(f"**Stats:** {num_groups} groups | {num_users} users | {num_subscriptions} subscriptions")
     for category in categorized:
         category_name = category[0][0][2].split(":")[0][2:]
         lines.extend([f"## {category_name}", ""])
