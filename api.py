@@ -132,7 +132,7 @@ def unsubscribe(access_token: str, group: str) -> str:
             db.executescript(f.read())
         with open("sql/functions/unsubscribe_user_from_group.sql") as f:
             arg = {
-                "username": username,
+                "username": username.lower(),
                 "group_name": group,
             }
             db.execute(f.read(), arg)
