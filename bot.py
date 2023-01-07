@@ -6,6 +6,7 @@ from typing import Deque
 import sqlite3
 import string
 import sys
+import urllib.parse
 
 import praw
 import prawcore
@@ -258,7 +259,8 @@ class UserPinger:
             message = message_template.substitute(
                 bot_username=self.username,
                 comment_url=comment.permalink,
-                group=token
+                group=token,
+                group_encoded=urllib.parse.quote(token)
             )
             with self.db:
                 with open("sql/functions/log_ping_group.sql") as f:
