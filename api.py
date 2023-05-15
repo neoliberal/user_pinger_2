@@ -30,7 +30,7 @@ def get_user(access_token: str) -> str:
     There's probably a better way to do this in praw, but it eludes me
     """
     try:
-        assert re.match("^[a-zA-Z0-9-_]+$", access_token)
+        assert re.match("^[a-zA-Z0-9-_.]+$", access_token)
     except AssertionError:
         # Malformed access token
         raise HTTPException(status_code=401, detail="Malformed access token")
