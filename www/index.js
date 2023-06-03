@@ -1,3 +1,7 @@
+// This code is an absolute disaster, please do not read it. I did not have a
+// goal in mind while writing this - I just kept adding stuff until it worked.
+
+
 // Page loading stuff goes at the top here
 
 
@@ -157,43 +161,6 @@ function list_group_subscribers(group) {
 }
 
 
-function build_alias_table(group, aliases) {
-    document.getElementById("group-aliases").innerHTML = "";
-    const aliases_header = document.createElement("h2");
-    const aliases_text = document.createTextNode("Aliases");
-    aliases_header.append(aliases_text);
-    document.getElementById("group-aliases").appendChild(aliases_header)
-
-    const create_alias_div = document.createElement("div");
-    const create_alias_input = document.createElement("input");
-    create_alias_input.id = "create_alias_group";
-    create_alias_input.onchange = validate_alias;
-    create_alias_div.append(create_alias_input);
-    const create_alias_button = document.createElement("button");
-    create_alias_button.append(document.createTextNode("Create alias"));
-    create_alias_button.group = group;
-    create_alias_button.addEventListener("click", create_alias)
-    create_alias_div.append(create_alias_button);
-    document.getElementById("group-aliases").appendChild(create_alias_div);
-
-    const alias_table = document.createElement("table");
-    for (var i = 0; i < aliases.length; i++) {
-        const alias_row = document.createElement("tr");
-        const alias_cell = alias_row.insertCell();
-        alias_cell.appendChild(document.createTextNode(aliases[i][0]));
-        const delete_alias_cell = alias_row.insertCell()
-        delete_alias_button = document.createElement("button");
-        delete_alias_button.appendChild(document.createTextNode("delete"));
-        delete_alias_button.group = group;
-        delete_alias_button.alias = aliases[i][0];
-        delete_alias_button.addEventListener("click", delete_alias)
-        delete_alias_cell.appendChild(delete_alias_button);
-        alias_table.appendChild(alias_row);
-    }
-    document.getElementById("group-aliases").appendChild(alias_table);
-}
-
-
 function build_settings_table(group, parameters) {
     document.getElementById("group-settings").innerHTML = "";
     const settings_header = document.createElement("h2");
@@ -276,12 +243,61 @@ function build_settings_table(group, parameters) {
 }
 
 
+function build_alias_table(group, aliases) {
+    document.getElementById("group-aliases").innerHTML = "";
+    const aliases_header = document.createElement("h2");
+    const aliases_text = document.createTextNode("Aliases");
+    aliases_header.append(aliases_text);
+    document.getElementById("group-aliases").appendChild(aliases_header)
+
+    const create_alias_div = document.createElement("div");
+    const create_alias_input = document.createElement("input");
+    create_alias_input.id = "create_alias_group";
+    create_alias_input.onchange = validate_alias;
+    create_alias_div.append(create_alias_input);
+    const create_alias_button = document.createElement("button");
+    create_alias_button.append(document.createTextNode("Create alias"));
+    create_alias_button.group = group;
+    create_alias_button.addEventListener("click", create_alias)
+    create_alias_div.append(create_alias_button);
+    document.getElementById("group-aliases").appendChild(create_alias_div);
+
+    const alias_table = document.createElement("table");
+    for (var i = 0; i < aliases.length; i++) {
+        const alias_row = document.createElement("tr");
+        const alias_cell = alias_row.insertCell();
+        alias_cell.appendChild(document.createTextNode(aliases[i][0]));
+        const delete_alias_cell = alias_row.insertCell()
+        delete_alias_button = document.createElement("button");
+        delete_alias_button.appendChild(document.createTextNode("delete"));
+        delete_alias_button.group = group;
+        delete_alias_button.alias = aliases[i][0];
+        delete_alias_button.addEventListener("click", delete_alias)
+        delete_alias_cell.appendChild(delete_alias_button);
+        alias_table.appendChild(alias_row);
+    }
+    document.getElementById("group-aliases").appendChild(alias_table);
+}
+
+
 function build_subscriber_table(group, subscribers) {
     document.getElementById("group-subscribers").innerHTML = "";
     const group_header = document.createElement("h2");
     const group_header_text = document.createTextNode("Subscribers");
     group_header.appendChild(group_header_text);
     document.getElementById("group-subscribers").appendChild(group_header);
+
+    const add_subscriber_div = document.createElement("div");
+    const add_subscriber_input = document.createElement("input");
+    add_subscriber_input.id = "add-subscriber";
+    add_subscriber_input.onchange = validate_add_subscriber;
+    add_subscriber_div.append(add_subscriber_input)
+    const add_subscriber_button = document.createElement("button");
+    add_subscriber_button.append(document.createTextNode("Add subscriber"));
+    add_subscriber_button.group = group;
+    add_subscriber_button.addEventListener("click", add_subscriber)
+    add_subscriber_div.append(add_subscriber_button);
+    document.getElementById("group-subscribers").appendChild(add_subscriber_div);
 
     const subscriber_table = document.createElement("table");
     subscriber_table.id = "subscriber-table";
@@ -491,6 +507,29 @@ function unsubscribe_user_from_group(evt) {
 
 
 // mod tools
+function add_subscriber(evt) {
+    // Yes this does exactly the same thing as subscribe_user_to_group
+    // But for some reason I thought it was a good idea to grab the group from
+    // the document rather than passing it with the event and I don't want to
+    // touch that grossness again.
+    //
+    // techdebt speedrun any% world record
+    const group = evt.target.group;
+    const name = document.getElementById("add-subscriber").value; // I don't care any more
+    fetch(
+        `api/subscribe_user?access_token=${access_token}&user=${name}&group=${group}`,
+        {method: "POST"}
+    ).then((response) => {
+        if (response.status == "200") {
+            //alert("User has been subscribed to group.");
+        } else {
+            alert("There was an error subscribing the user. Please try again.");
+        }
+        list_group_subscribers(group);
+    });
+}
+
+
 function subscribe_user_to_group() {
     let group = document.getElementById("subscribe_user_group").value;
     let name = document.getElementById("subscribe_user_name").value;
@@ -589,6 +628,20 @@ function validate_username(e) {
     } else {
         e.parentElement.classList.remove("bad-input");
         document.getElementById("target-user-button").classList.remove("bad-input");
+    }
+}
+
+
+function validate_add_subscriber(e) {
+    // Imagine writing such bad code that you can't even reuse a validation function
+    //
+    // Couldn't be me
+    let username = e.target.value;
+    if (!username.match(/^[a-zA-Z0-9_-]{1,20}$/)) {
+        e.target.parentElement.classList.add("bad-input");
+    } else {
+        e.target.parentElement.classList.remove("bad-input");
+        document.getElementById("add-subscriber").classList.remove("bad-input");
     }
 }
 
