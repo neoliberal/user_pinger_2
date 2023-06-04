@@ -290,6 +290,21 @@ def get_ping_log(after_epoch: int) -> str:
     return ping_log
 
 
+@api.get(path="/get_new_groups")
+def get_new_groups(after_epoch: int) -> List[List[str]]:
+    subreddit = os.environ["SUBREDDIT"].split("+")[0]
+    db = sqlite3.connect(f"sql/db/{subreddit}.db")
+    cur = db.cursor()
+    with db:
+        with open("sql/functions/init_db.sql") as f:
+            db.executescript(f.read())
+        with open("sql/functions/get_new_groups.sql") as f:
+            arg = {"after_epoch": after_epoch}
+            new_groups = cur.execute(f.read(), arg).fetchall()
+    db.close()
+    return new_groups
+
+
 @api.get(path="/get_group_subscribers")
 def get_group_subscribers(access_token:str, group):
     group = group.upper()
@@ -318,7 +333,6 @@ def get_group_subscribers(access_token:str, group):
             subscribers = cur.execute(f.read(), arg).fetchall()
     db.close()
     return subscribers
-
 
 
 class SubCategory(TypedDict):
