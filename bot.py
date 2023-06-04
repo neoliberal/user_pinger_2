@@ -96,8 +96,8 @@ class UserPinger:
 
         # Get token containing group(s) to be pinged
         self.logger.debug(
-            "%s handling comment from user %s", 
-            comment.id, 
+            "%s handling comment from user %s",
+            comment.id,
             str(comment.author)
         )
         comment_split = comment.body.upper().split()
@@ -188,22 +188,23 @@ class UserPinger:
 
         # Ensure user has permission to ping group(s)
         mods = self.primary_subreddit.moderator()
+        author = str(comment.author)
         try:
             mods = [mod.name for mod in mods]
         except AttributeError:
             # This allows for passing in mods as a list of strings during tests
             pass
-        if str(comment.author) not in mods:
+        if author not in mods:
             for group in groups:
                 # Check if subscribed
                 with self.db:
                     with open("sql/functions/get_group_subscribers.sql") as f:
                         subscribers = [
-                            username[0] 
-                            for username 
+                            username[0]
+                            for username
                             in self.db.execute(f.read(), {"group_name": group})
                         ]
-                if str(comment.author).lower() not in subscribers:
+                if author.lower() not in subscribers:
                     self.logger.warning(
                         "%s not subscribed to %s", comment.id, group
                     )
@@ -243,7 +244,7 @@ class UserPinger:
         log_data = {
             "comment_id": comment.id,
             "permalink": comment.permalink,
-            "author": str(comment.author).lower(),
+            "author": author.lower(),
             "token": token,
             "created_epoch_sec": int(comment.created_utc)
         }
@@ -253,7 +254,7 @@ class UserPinger:
         self.parsed.append(comment.id) # do not attempt retry below this point
         pinged = []
         for group in groups:
-            subject = f"Ping in {group} from {str(comment.author)}"
+            subject = f"Ping in {token} from {author}"
             with open("templates/ping_message.txt") as f:
                 message_template = string.Template(f.read())
             message = message_template.substitute(
@@ -265,17 +266,17 @@ class UserPinger:
             with self.db:
                 with open("sql/functions/log_ping_group.sql") as f:
                     self.db.execute(
-                        f.read(), 
+                        f.read(),
                         {"group_name": group, "comment_id": comment.id}
                     )
                 with open("sql/functions/get_group_subscribers.sql") as f:
                     subscribers = [
-                        username[0] 
-                        for username 
+                        username[0]
+                        for username
                         in self.db.execute(f.read(), {"group_name": group})
                     ]
             for subscriber in subscribers:
-                if subscriber == str(comment.author).lower():
+                if subscriber == author.lower():
                     # Don't ping the person who sent the ping
                     continue
                 if subscriber in pinged:
@@ -288,9 +289,25 @@ class UserPinger:
                         subject=subject, message=message
                     )
                 except praw.exceptions.APIException as ex:
-                    # Don't care why. We'll check for deleted/suspended
-                    # accounts in prune_users.py
-                    pass
+                    # Turns out the best way to determine whether a user is
+                    # deleted/suspended is to try and message them. Therefore
+                    # we do the check here rather than in prune.py
+                    ex_types = [
+                        subexception.error_type for subexception in ex.items
+                    ]
+                    if (
+                        "USER_DOESNT_EXIST" in ex_types
+                        or "INVALID_USER" in ex_types
+                    ):
+                        unsubscribe_all_path = (
+                            "sql/functions/unsubscribe_user_from_all.sql"
+                        )
+                        with open(unsubscribe_all_path) as f:
+                            self.logger.info(
+                                "unsubscribing deleted/suspended user %s",
+                                subscriber
+                            )
+                            self.db.execute(f.read(), {"username": subscriber})
             self.logger.info("%s Finished pinging group %s", comment.id, group)
         self.logger.info("%s Finished pinging token %s", comment.id, token)
 
@@ -321,7 +338,7 @@ class UserPinger:
         reply.edit(ping_comment)
         self.logger.debug("%s Reply edited, done", comment.id)
 
-    
+
     def message_error_reply(self, message, error):
         """Sends an error message
 
