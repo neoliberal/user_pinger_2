@@ -16,7 +16,7 @@ Action | Body Text
 |---|---|
 Subscribe to GROUP | subscribe GROUP
 Unsubscribe from GROUP | unsubscribe GROUP
-[List my subscriptions](https://reddit.com/message/compose?to=${bot_username}&subject=List%20my%20subscriptions&message=list_my_subscriptions) | unsubscribe
+[List my subscriptions](https://reddit.com/message/compose?to=${bot_username}&subject=List%20my%20subscriptions&message=list_my_subscriptions) | list_my_subscriptions
 [Unsubscribe from all groups](https://reddit.com/message/compose?to=${bot_username}&subject=Unsubscribe%20from%20all%20groups&message=unsubscribe) | unsubscribe
 
 If you have a new account that is unable to send DMs you can also [manage your subscriptions on neoliber.al](https://neoliber.al/user_pinger_2/)
