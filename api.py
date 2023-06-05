@@ -274,18 +274,43 @@ def get_group_aliases(alias: str) -> List[str]:
     return aliases
 
 
-
 @api.get(path="/get_ping_log")
-def get_ping_log(after_epoch: int) -> str:
+def get_ping_log(
+    epoch_sec: int,
+    group_name: str,
+    sort: str,
+    count: int
+) -> List:
+    try:
+        assert sort in ("ASC", "DESC")
+    except AssertionError:
+        raise HTTPException(status_code=400, detail="Sort must be ASC or DESC")
+    try:
+        assert 1 <= count <= 50
+    except AssertionError:
+        raise HTTPException(
+            status_code=400, detail="count must be between 1 and 50"
+        )
+    if not group_is_valid_and_exists(group_name):
+        raise HTTPException(
+            status_code=400, detail="Group is invalid or does not exist"
+        )
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
     cur = db.cursor()
     with db:
         with open("sql/functions/init_db.sql") as f:
             db.executescript(f.read())
-        with open("sql/functions/get_ping_log.sql") as f:
-            arg = {"after_epoch": after_epoch}
-            ping_log = cur.execute(f.read(), arg).fetchall()
+        arg = {
+            "epoch_sec": epoch_sec, "group_name": group_name, "count": count
+        }
+        if sort == "ASC":
+            with open("sql/functions/get_ping_log_after.sql") as f:
+                ping_log = cur.execute(f.read(), arg).fetchall()
+        else:
+            # Can assume sort is DESC
+            with open("sql/functions/get_ping_log_before.sql") as f:
+                ping_log = cur.execute(f.read(), arg).fetchall()
     db.close()
     return ping_log
 
