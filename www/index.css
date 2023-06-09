@@ -167,10 +167,15 @@ input[type="checkbox"] {
 
 tr input {
     max-width: 28vw;
+    text-overflow: ellipsis;
 }
 
 td input, td button {
     font-size: min(0.95em, 3vw);
+}
+
+tr td:nth-child(4) input {
+    min-width: 19vw;
 }
 
 .bad-input input, input.bad-input {
