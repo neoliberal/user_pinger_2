@@ -283,7 +283,7 @@ function build_alias_table(group, aliases) {
 function build_subscriber_table(group, subscribers) {
     document.getElementById("group-subscribers").innerHTML = "";
     const group_header = document.createElement("h2");
-    const group_header_text = document.createTextNode("Subscribers");
+    const group_header_text = document.createTextNode(`${subscribers.length} Subscribers`);
     group_header.appendChild(group_header_text);
     document.getElementById("group-subscribers").appendChild(group_header);
 
@@ -304,8 +304,11 @@ function build_subscriber_table(group, subscribers) {
     for (var i = 0; i < subscribers.length; i++) {
         const subscriber_row = document.createElement("tr");
         const user_cell = subscriber_row.insertCell();
+        const user_link = document.createElement("a");
+        user_link.href = `https://reddit.com/user/${subscribers[i]}`;
         const user_text = document.createTextNode(subscribers[i]);
-        user_cell.appendChild(user_text);
+        user_link.appendChild(user_text);
+        user_cell.appendChild(user_link);
         const unsubscribe_cell = subscriber_row.insertCell();
         const unsubscribe_button = document.createElement("button");
         unsubscribe_button.appendChild(document.createTextNode("unsubscribe"));
