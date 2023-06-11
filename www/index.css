@@ -27,6 +27,7 @@
 #logout {
     margin-left: auto;
     border: none;
+    border-radius: 0 3px 0 0;
     font-size: 18px;
     line-height: 20px;
 }
