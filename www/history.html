@@ -9,6 +9,7 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
     <title>Deep State HQ</title>
     <link rel="stylesheet" href="history.css">
     <script type="text/javascript" src="history.js" defer></script>
+    <script type="text/javascript" src="reddit_embed.js" defer></script>
 
     <link rel="stylesheet" href="/common.css">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -74,6 +75,9 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
         <hr>
         <p>
             You can use this page to search for past pings.
+            <a href="/user_pinger_2/">
+                Click here to return to the list of ping groups
+            </a>
         </p>
         <div id="search-inputs">
             <div>
@@ -90,18 +94,18 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
             </div>
             <div>
                 <label for="search-date">Date</label>
-                <input id="search-date" type="date" value="2023-04-20"/>
+                <input id="search-date" type="datetime-local" step=1 value="2023-04-20"/>
+                <button onclick="reset_date()">Reset Date</button>
             </div>
             <div>
                 <label for="search-count">Num. Returned</label>
                 <select id="search-count" name="count">
-                    <option>1</option>
+                    <option selected="selected">1</option>
                     <option>5</option>
-                    <option selected="selected">10</option>
-                    <option>25</option>
-                    <option>50</option>
+                    <option>10</option>
                 </select>
             </div>
+        </div>
         <button id="search-button" onclick="search_ping_log()">Search</button>
         <div id="search-results">
         </div>

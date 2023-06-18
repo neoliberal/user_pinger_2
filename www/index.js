@@ -1342,7 +1342,11 @@ function build_group_table(groups, old_groups) {
                     group_name = document.createTextNode(group[1]);
                     group_description = document.createTextNode(group[2]);
                 }
-                let group_activity = document.createTextNode(group[4]);
+                //let group_activity = document.createTextNode(group[4]);
+                let group_activity = document.createElement("a");
+                group_activity.href = `/user_pinger_2/history.html?group_name=${group[1]}&count=5`;
+                let group_activity_count = document.createTextNode(group[4]);
+                group_activity.append(group_activity_count);
                 let group_move_up = document.createElement("button");
                 group_move_up.addEventListener("click", function() {move_group_up(group[7]);});
                 group_move_up.appendChild(document.createTextNode("\u{2B06}"));

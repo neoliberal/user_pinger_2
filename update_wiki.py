@@ -58,7 +58,7 @@ def update(reddit, subreddit, after_epoch):
             for group in subcategory:
                 group_name = group[0]
                 description = group[1]
-                activity = group[5]
+                activity = f"[{group[5]}](https://neoliber.al/user_pinger_2/history.html?group_name={group[0]}&count=5)"
                 protected = "protected" if group[3] else ""
                 locked = "locked" if group[4] else ""
                 attributes = ", ".join(filter(None, [locked, protected]))
