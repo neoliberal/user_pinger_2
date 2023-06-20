@@ -1,7 +1,16 @@
 #search-results {
     text-align: center;
+    margin-top: 1em;
 }
 
 .search-result {
     margin-bottom: 1em;
+}
+
+#search-inputs > * {
+    padding: 1px 0;
+}
+
+#search-results button {
+    margin: 0 1px;
 }
