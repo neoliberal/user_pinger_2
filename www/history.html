@@ -71,13 +71,15 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
 
     <!-- All individual webpage stuff should go in content -->
     <div id="content">
+        <noscript>
+            <div id="noscript">This page requires Javascript to be enabled to function</div>
+        </noscript>
         <h2>User Pinger > History</h2>
         <hr>
         <p>
             You can use this page to search for past pings.
-            <a href="/user_pinger_2/">
-                Click here to return to the list of ping groups
-            </a>
+            <a href="/user_pinger_2/">Click here to return to the list of ping groups.</a>
+            Firefox users may need to disable enhanced tracking protection.
         </p>
         <div id="search-inputs">
             <div>
@@ -87,7 +89,7 @@ STOP LOOKING AT MY CODE YOU FUCKING NERD 😡
             <div>
                 <label for="search-date">Date</label>
                 <input id="search-date" type="datetime-local" step=1 value="2023-04-20"/>
-                <button onclick="reset_date()">Reset Date</button>
+                <button onclick="reset_date()">Reset</button>
             </div>
             <div>
                 <input type="radio" id="search-before" name="search_type" checked />
