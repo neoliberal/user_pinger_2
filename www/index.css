@@ -225,3 +225,17 @@ tr td:nth-child(4) input {
         transform: rotate(1turn);
     }
 }
+
+@media (prefers-contrast: more) {
+
+    #groups.user-mode tr:nth-child(2n) td:nth-child(n+2),
+    #groups.user-mode tr:nth-child(2n) th:nth-child(n+2) {
+        background-color: unset;
+    }
+
+    #groups.user-mode td:nth-child(n+2),
+    #groups.user-mode th:nth-child(n+2) {
+        background-color: unset;
+        border-bottom: 1px solid;
+    }
+}
