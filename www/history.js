@@ -15,15 +15,16 @@ function main() {
     });
     reset_date();
     const params = new URLSearchParams(window.location.search);
+    const size = Array.from(params).length;
     // stupid logic, don't care
-    if (params.size === 1) {
+    if (size === 1) {
         document.getElementById("search-group-name").value = params.get("group_name").toUpperCase();
         search_ping_log();
-    } else if (params.size === 2) {
+    } else if (size === 2) {
         document.getElementById("search-count").value = params.get("count");
         document.getElementById("search-group-name").value = params.get("group_name").toUpperCase();
         search_ping_log();
-    } else if (params.size > 1) {
+    } else if (size > 1) {
         document.getElementById("search-group-name").value = params.get("group_name").toUpperCase();
         document.getElementById("search-count").value = params.get("count");
         const epoch = new Date(params.get("epoch_sec") * 1000);
