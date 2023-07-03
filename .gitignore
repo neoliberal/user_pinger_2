@@ -4,3 +4,6 @@ api.sock
 sql/db/
 variables.env*
 *.swp
+
+# Jetbrains files
+.idea/*
