@@ -269,7 +269,7 @@ def get_group_aliases(alias: str) -> List[str]:
             db.executescript(f.read())
         with open("sql/functions/get_group_aliases.sql") as f:
             arg = {"group_name": group}
-            aliases = cur.execute(f.read(), arg).fetchall()
+            aliases = [item[0] for item in cur.execute(f.read(), arg).fetchall()]
     db.close()
     return aliases
 

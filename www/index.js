@@ -266,7 +266,7 @@ function build_alias_table(group, aliases) {
     for (var i = 0; i < aliases.length; i++) {
         const alias_row = document.createElement("tr");
         const alias_cell = alias_row.insertCell();
-        alias_cell.appendChild(document.createTextNode(aliases[i][0]));
+        alias_cell.appendChild(document.createTextNode(aliases[i]));
         const delete_alias_cell = alias_row.insertCell()
         delete_alias_button = document.createElement("button");
         delete_alias_button.appendChild(document.createTextNode("delete"));
