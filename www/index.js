@@ -271,7 +271,7 @@ function build_alias_table(group, aliases) {
         delete_alias_button = document.createElement("button");
         delete_alias_button.appendChild(document.createTextNode("delete"));
         delete_alias_button.group = group;
-        delete_alias_button.alias = aliases[i][0];
+        delete_alias_button.alias = aliases[i];
         delete_alias_button.addEventListener("click", delete_alias)
         delete_alias_cell.appendChild(delete_alias_button);
         alias_table.appendChild(alias_row);
