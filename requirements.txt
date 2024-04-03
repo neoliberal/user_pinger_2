@@ -1,5 +1,4 @@
-praw
+praw==7.7.1
 git+https://github.com/neoliberal/slack_python_logging
-uvicorn==0.16.0
-requests-unixsocket
+uvicorn[standard]==0.29.0
 fastapi

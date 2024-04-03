@@ -13,6 +13,7 @@ import time
 from typing import List, Union
 
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 import praw
 from pydantic import BaseModel
 from typing_extensions import TypedDict
@@ -23,7 +24,7 @@ import pinglib
 
 api = FastAPI()
 
-@api.get(path="/me")
+@api.get(path="/api/me")
 def get_user(access_token: str) -> str:
     """
     Returns the name of the Reddit user corresponding to the access token.
@@ -92,7 +93,7 @@ def is_mod(username):
     return username in reddit.subreddit(subreddit).moderator()
 
 
-@api.post(path="/subscribe")
+@api.post(path="/api/subscribe")
 def subscribe(access_token: str, group: str) -> str:
     username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
@@ -120,7 +121,7 @@ def subscribe(access_token: str, group: str) -> str:
     return "success"
 
 
-@api.post(path="/unsubscribe")
+@api.post(path="/api/unsubscribe")
 def unsubscribe(access_token: str, group: str) -> str:
     username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
@@ -139,7 +140,7 @@ def unsubscribe(access_token: str, group: str) -> str:
     return "success"
 
 
-@api.post(path="/subscribe_user")
+@api.post(path="/api/subscribe_user")
 def subscribe_user(access_token: str, user: str, group:str) -> str:
     username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
@@ -163,7 +164,7 @@ def subscribe_user(access_token: str, user: str, group:str) -> str:
     return "success"
 
 
-@api.post(path="/unsubscribe_user")
+@api.post(path="/api/unsubscribe_user")
 def unsubscribe_user(access_token: str, user: str, group:str) -> str:
     username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
@@ -186,7 +187,7 @@ def unsubscribe_user(access_token: str, user: str, group:str) -> str:
     return "success"
 
 
-@api.post(path="/create_alias")
+@api.post(path="/api/create_alias")
 def create_alias(access_token: str, alias: str, group: str) -> str:
     username = get_user(access_token)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
@@ -215,7 +216,7 @@ def create_alias(access_token: str, alias: str, group: str) -> str:
     return "success"
 
 
-@api.post(path="/delete_alias")
+@api.post(path="/api/delete_alias")
 def delete_alias(access_token: str, alias: str) -> str:
     username = get_user(access_token)
     alias = alias.upper()
@@ -236,7 +237,7 @@ def delete_alias(access_token: str, alias: str) -> str:
     return "success"
 
 
-@api.get(path="/de_alias_group")
+@api.get(path="/api/de_alias_group")
 def de_alias_group(alias: str) -> str:
     alias = alias.upper()
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
@@ -258,7 +259,7 @@ def de_alias_group(alias: str) -> str:
     return group
 
 
-@api.get(path="/get_group_aliases")
+@api.get(path="/api/get_group_aliases")
 def get_group_aliases(alias: str) -> List[str]:
     group = de_alias_group(alias)
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
@@ -274,7 +275,7 @@ def get_group_aliases(alias: str) -> List[str]:
     return aliases
 
 
-@api.get(path="/get_ping_log")
+@api.get(path="/api/get_ping_log")
 def get_ping_log(
     epoch_sec: int,
     group_name: str,
@@ -315,7 +316,7 @@ def get_ping_log(
     return ping_log
 
 
-@api.get(path="/get_new_groups")
+@api.get(path="/api/get_new_groups")
 def get_new_groups(after_epoch: int) -> List[List[str]]:
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
     db = sqlite3.connect(f"sql/db/{subreddit}.db")
@@ -330,7 +331,7 @@ def get_new_groups(after_epoch: int) -> List[List[str]]:
     return new_groups
 
 
-@api.get(path="/get_group_subscribers")
+@api.get(path="/api/get_group_subscribers")
 def get_group_subscribers(access_token:str, group):
     group = group.upper()
     subreddit = os.environ["SUBREDDIT"].split("+")[0]
@@ -375,7 +376,7 @@ class UpdateGroups(TypedDict):
     groups: List[Category]
 
 
-@api.get(path="/list_user_groups")
+@api.get(path="/api/list_user_groups")
 def list_user_groups(access_token:str, target_user:str) -> List[Category]:
     """List a user's groups on the website"""
     username = get_user(access_token)
@@ -386,7 +387,7 @@ def list_user_groups(access_token:str, target_user:str) -> List[Category]:
     return get_groups(username, target_user.lower())
 
 
-@api.get(path="/list_groups")
+@api.get(path="/api/list_groups")
 def list_groups(access_token:str) -> List[Category]:
     """List the groups for display on the website"""
     username = get_user(access_token).lower()
@@ -458,7 +459,7 @@ def get_groups(username: str, target_user:str) -> List[Category]:
     return doc
 
 
-@api.post(path="/update_groups")
+@api.post(path="/api/update_groups")
 def update_groups(config: UpdateGroups):
     """Update the ping_groups database"""
 
@@ -539,6 +540,10 @@ def update_groups(config: UpdateGroups):
                     db.execute(f.read(), arg)
     return "success"
 
+api_path = os.path.abspath(__file__)
+pinger_dir = os.path.dirname(api_path)
+static_files_dir = os.path.join(pinger_dir, 'www')
+api.mount("/", StaticFiles(directory=static_files_dir), name="static")
 
 if __name__ == "__main__":
-    uvicorn.run(api, uds="api.sock", root_path="/api")
+    uvicorn.run(api, port=5000)
