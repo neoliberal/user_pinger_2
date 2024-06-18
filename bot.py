@@ -572,6 +572,6 @@ if __name__ == "__main__":
     while True:
         try:
             user_pinger.listen()
-        except recoverable_errors:
-            user_pinger.logger.warning("Reddit API error - sleeping 1 minute")
+        except recoverable_errors as e:
+            user_pinger.logger.warning(f"Reddit API error - {repr(e)} - sleeping 1 minute")
             time.sleep(60)
