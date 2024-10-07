@@ -62,15 +62,14 @@ class UserPinger:
             ):
                 self.handle_comment(comment)
         for item in self.reddit.inbox.unread(limit=1):
-            if isinstance(item, praw.models.Message):
-                # Only trigger on messages, not replies or username pings
-                if item.created_utc > self.start_time:
-                    # Only trigger on messages posted after startup
-                    self.handle_message(item)
-                else:
-                    item.mark_read()
-            else:
+            if (
+                not isinstance(item, praw.models.Message) # reply or /u/ ping
+                or item.created_utc < self.start_time # before startup
+                or item.author is None # sent by subreddit
+            ):
                 item.mark_read()
+            else:
+                self.handle_message(item)
 
 
     def ping_error_reply(self, comment, error):
